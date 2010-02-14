@@ -1,0 +1,13 @@
+setup.cfg
+setup.py
+cups_fab/__init__.py
+cups_fab/cups.py
+cups_fab/network.py
+cups_fab/pstoedit.py
+cups_fab/serial_port.py
+cups_fab.egg-info/PKG-INFO
+cups_fab.egg-info/SOURCES.txt
+cups_fab.egg-info/dependency_links.txt
+cups_fab.egg-info/entry_points.txt
+cups_fab.egg-info/not-zip-safe
+cups_fab.egg-info/top_level.txt

@@ -1,0 +1,168 @@
+#!/usr/bin/env python
+# Brandon Edens
+# AS220
+# 2009-12-18
+# Copyright (C) 2009 Brandon Edens <brandon@as220.org>
+#
+# This file is part of cups_fab.
+#
+# cups_fab is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cups_fab is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cups_fab. If not, see <http://www.gnu.org/licenses/>.
+"""
+Main entry point for vinyl cutter printing.
+"""
+
+###############################################################################
+## Imports
+###############################################################################
+from cStringIO import StringIO
+import os
+import sys
+import traceback
+
+# Local imports
+from cups_fab import log
+from cups_fab.cups import *
+from cups_fab.network import *
+from cups_fab.pstoedit import *
+from cups_fab.serial import *
+
+
+###############################################################################
+## Constants
+###############################################################################
+
+DEBUG = True
+
+
+###############################################################################
+## Functions
+###############################################################################
+
+def main():
+    """
+    Main method of program.
+    """
+    if len(sys.argv) == 1:
+        program_name = os.path.basename(sys.argv[0])
+        print "direct %s \"Unknown\" \"Vinyl Cutter (thin red lines vector cut)\"\n" % program_name
+        sys.exit(1)
+
+    # Read command line arguments
+    log.info('Parsing arguments for print job.')
+    command_line_args = command_line_parameters(sys.argv)
+
+    # Read DEVICE_URI environment variable
+    env_device_uri = os.getenv("DEVICE_URI")
+    if not env_device_uri:
+        log.crit('Failure to print, no environment variable DEVICE_URI set.')
+        sys.exit(1)
+    log.info('Parsing queue options.')
+    queue_options = device_uri(env_device_uri)
+
+
+    log.info('Reading in cups provided data.')
+    in_file = None
+    try:
+        in_filename = command_line_args['in_filename']
+        log.info("Loading cups data via input filename %s." % in_filename)
+        # Check for the existence of the input file
+        if not os.path.isfile(in_filename):
+            log.crit("Unable to open input file %s for print job." % in_filename)
+            sys.exit(1)
+            in_file = open(in_filename, 'r')
+    except KeyError:
+        if not DEBUG:
+            log.info("Loading cups data via stdin with debug turned off.")
+            # Postscript is coming from stdin
+            in_file = sys.stdin
+        else:
+            log.info("Loading cups data via stdin and creating StringIO to hold file information.")
+            in_file = StringIO()
+            in_file.write(sys.stdin.read())
+            in_file.seek(0)
+
+    if DEBUG:
+        # Please note that if DEBUG is enabled we will not be using stdin so
+        # its okay to read out the input data.
+        out_file = open("/tmp/%s_%s.cups" % (os.getenv('PRINTER'), os.getpid()), 'w')
+        # Make file available to everyone.
+        os.fchmod(out_file.fileno(), 0666)
+        log.info("Debug turned on so dumping input from cups to file %s." % out_file.name)
+        in_file.seek(0)
+        out_file.write(in_file.read())
+        out_file.close()
+        in_file.seek(0)
+
+
+    # Generate the HPGL text
+    log.info('Generating HPGL information from input file')
+    hpgl_text = execute_pstoedit(in_file)
+    if hpgl_text.strip() == "":
+        # hpgl_text is empty meaning that there is no vector to cut. Present
+        # error message and exit.
+        log.crit('No vector information (thin red lines) found in input file.')
+        sys.exit(1)
+
+    if DEBUG:
+        # If debug is enabled then write out contents of hpgl text.
+        out_file = open("/tmp/%s_%s.hpgl" % (os.getenv('PRINTER'), os.getpid()), 'w')
+        # Make file available to everyone.
+        os.fchmod(out_file.fileno(), 0666)
+        out_file.write(hpgl_text)
+        out_file.close()
+
+    # Close up the in_file.
+    in_file.close()
+
+    # Determine whether or not to send to network socket or serial port
+    device_name = queue_options['device']
+    if is_serial_port(device_name):
+        # Send HPGL to the serial port.
+        log.info("Sending hpgl via serial to %s." % device_name)
+        serial_send(hpgl_text, port=device_name)
+
+    elif is_host(device_name):
+        # We have a host. Attempt to extract host and port.
+        host, port = hostname_port(device_name)
+        # Now check that the host exists.
+        if not host_exists(host, port):
+            # Host does not exist, error and exit.
+            log.crit("Could not find specified host %s with port %s." % (host, port))
+            sys.exit(1)
+        # Transmit to the host at the given port.
+        log.info("Sending hpgl via network to %s:%s." % (host, port))
+        network_send(hpgl_text, host, port)
+
+    else:
+        # Specified device is neither a serial port or a host
+        # Error and exit.
+        log.crit('Specified device name in DEVICE_URI string is neither serial port or host.')
+        sys.exit(1)
+
+
+    # We have successfully sent job.
+    log.info("Job number %s named %s for user %s completed." % (command_line_args['job_number'],
+                                                                command_line_args['title'],
+                                                                command_line_args['user']))
+
+if __name__ == '__main__':
+    try:
+        main()
+        sys.exit(0)
+    except Exception as e:
+        traceback.print_exc()
+        log.crit("Failure is %s." % e)
+        sys.exit(1)
+
+

@@ -1,0 +1,55 @@
+// Include standard font and media definitions
+#include <font.defs>
+#include <media.defs>
+
+// Define custom media sizes
+#media "Vinyl_12in_Roll" 12in 720in
+#media "Vinyl_24in_Roll" 24in 720in
+#media "Roland_Max_Size_Bed" 27.5in 720in
+
+// Specify this is a PostScript printer driver
+DriverType ps
+
+// List the fonts that are supported, in this case all standard fonts
+Font *
+
+// Manufacturer, model name, and version
+Manufacturer "Roland"
+ModelName "Camm-1 CX-24"
+Version 1.0
+
+// PostScript printer attributes
+Attribute DefaultColorSpace "" RGB
+Attribute LandscapeOrientation "" Any
+Attribute LanguageLevel "" "3"
+Attribute Product "" "(Roland Camm-1 CX-24)"
+Attribute PSVersion "" "(3010) 0"
+Attribute TTRasterizer "" Type42
+
+
+// Set the hardware margins which are: left bottom right top
+HWMargins 0 0 0 0
+
+// Supported page sizes
+*MediaSize "Roland_Max_Size_Bed"
+MediaSize "Vinyl_12in_Roll"
+MediaSize "Vinyl_24in_Roll"
+
+// Query command for page size
+Attribute "?PageSize" "" "
+      save
+      currentpagedevice /PageSize get aload pop
+      2 copy gt {exch} if (Unknown)
+      23 dict
+              dup [1980 51840] "(Roland - Max Size Bed)" put
+              dup [864 51840] "(Vinyl - 12in Roll)" put
+              dup [1728 51840] "(Vinyl - 24in Roll)" put
+              {exch aload pop 4 index sub abs 5 le exch
+               5 index sub abs 5 le and
+              {exch pop exit} {pop} ifelse
+      } bind forall = flush pop pop
+      restore"
+
+// Specify the name of the PPD file we want to generate
+PCFileName "roland-camm-1.ppd"
+

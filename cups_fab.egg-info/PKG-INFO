@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: print-hpgl
+Version: 0.1dev
+Summary: Python cups backend for HPGL printing.
+Home-page: http://as220.org/git/gitweb/
+Author: Brandon Edens
+Author-email: brandon@as220.org
+License: GPL-3
+Description: Python cups backend for printing to HPGL devices.
+Keywords: hpgl cups
+Platform: UNKNOWN
