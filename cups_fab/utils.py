@@ -26,7 +26,9 @@
 import os
 import re
 import socket
+import stat
 
+import log
 from config import config
 
 
@@ -51,10 +53,10 @@ def is_serial_port(filename):
     serial ports). Return True for success, false otherwise.
     """
     # Create complete serial port name.
-    serial_port = config.device_dir + filename
+    log.debug("Attempting to check existence of serial port at %s." % filename)
     # Check to make sure the serial port is a character device
     try:
-        mode = os.stat(serial_port)[stat.ST_MODE]
+        mode = os.stat(filename)[stat.ST_MODE]
         if stat.S_ISCHR(mode):
             # We have a character device, return true.
             return True

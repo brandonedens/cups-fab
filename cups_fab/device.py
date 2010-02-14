@@ -25,6 +25,7 @@
 
 import os
 import re
+import serial
 import socket
 import sys
 
@@ -108,8 +109,8 @@ class Device(object):
                             rtscts=config.serial_hardware_flow)
         # Flush output (removing any initial contents)
         ser.flushOutput()
-        # Write contents of text to the serial port
-        ser.write(text)
+        # Write data to the serial port
+        ser.write(data)
         # Close the serial port
         ser.close()
 
