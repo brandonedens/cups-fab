@@ -24,46 +24,29 @@ postscript/pdf to a vector format.
 ###############################################################################
 ## Imports
 ###############################################################################
+
 from cStringIO import StringIO
 import log
 import subprocess
 import sys
 
-
-###############################################################################
-## Constants
-###############################################################################
-
-# Default X-scaling value.
-DEFAULT_XSCALE=1.416666
-
-# Default Y-scaling value.
-DEFAULT_YSCALE=1.416666
-
-# The output format of pstoedit
-OUTPUT_FORMAT="hpgl:-pen"
-
-# Location of the pstoedit binary
-PSTOEDIT="/usr/bin/pstoedit"
-
-# Location for PSTOEDIT to work within
-TMP_DIR='/tmp/'
+from config import config
 
 
 ###############################################################################
 ## Functions
 ###############################################################################
 
-def execute_pstoedit(in_file,
-                     xscale=DEFAULT_XSCALE,
-                     yscale=DEFAULT_YSCALE):
+def execute(in_file,
+            xscale=config.xscale,
+            yscale=config.yscale):
     """
     Execute pstoedit returning the generated HPGL to the calling function.
     """
     # Arguments to pass to pstoedit
-    args = [PSTOEDIT,
+    args = [config.pstoedit,
             "-f",
-            OUTPUT_FORMAT,
+            config.pstoedit_format,
             "-dt", # Draw the text rather than assume cutter can handle text
             "-pta", # Precision text spacing (spaces handled gracefully)
             "-xscale",
@@ -73,7 +56,8 @@ def execute_pstoedit(in_file,
             "-"]
 
     # Execute pstoedit
-    process = subprocess.Popen(args, cwd=TMP_DIR, stdout=subprocess.PIPE,
+    process = subprocess.Popen(args, cwd=config.tmp_dir,
+                               stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE,
                                stdin=subprocess.PIPE)
     (stdoutdata, stderrdata) = process.communicate(in_file.read())
