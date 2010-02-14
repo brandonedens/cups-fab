@@ -1,10 +1,12 @@
 setup.cfg
 setup.py
 cups_fab/__init__.py
-cups_fab/cups.py
-cups_fab/network.py
+cups_fab/config.py
+cups_fab/device.py
+cups_fab/job.py
+cups_fab/log.py
 cups_fab/pstoedit.py
-cups_fab/serial_port.py
+cups_fab/utils.py
 cups_fab.egg-info/PKG-INFO
 cups_fab.egg-info/SOURCES.txt
 cups_fab.egg-info/dependency_links.txt
