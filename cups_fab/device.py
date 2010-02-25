@@ -141,8 +141,13 @@ class Device(object):
         log.info("Sending data via network to %s." % self.name)
         # Open the socket
         sock = socket.create_connection((self.host, self.port), config.socket_timeout)
-        # Send HPGL commands to the socket
-        sock.sendall(data)
+        # Send data to the socket
+        try:
+            sock.sendall(data)
+        except TypeError:
+            # We likely have a StringIO to send to the socket
+            sock.sendall(data.read())
+
         # Close up the socket
         sock.close()
 
@@ -288,6 +293,8 @@ class RasterVector(Device):
                 pass
             elif line[0] == 'X':
                 pass
+
+        hpgl.seek(0)
         return hpgl
 
     def raster_to_pcl(self, image):
@@ -332,6 +339,9 @@ class RasterVector(Device):
             pcl.write(ESCAPE + "*p%dY" % 0)
             pcl.write(ESCAPE + "*p%dX" % 0)
             pass
+
+        pcl.seek(0)
+        return pcl
 
     def ps_to_eps(self, in_file):
         """
@@ -393,6 +403,65 @@ class RasterVector(Device):
                             out.write("30{180 mul cos exch 180 mul cos add 2 div}setscreen\n")
         out.seek(0)
         return out
+
+    def hpgl_pcl_to_pjl(self, raster, vector):
+        """
+        Convert HPGL+PCL data to printer job language (pjl).
+        """
+        pjl = StringIO()
+
+        # Print the printer job language header.
+        pjl.write(ESCAPE + "%%-12345X@PJL JOB NAME=%s\r\n" % job_title)
+        pjl.write(ESCAPE + "E@PJL ENTER LANGUAGE=PCL\r\n")
+        # Set autofocus on or off.
+        pjl.write(ESCAPE + "&y%dA" % self.focus)
+        # Left (long-edge) offset registration. Adjusts the position of the
+        # logical page across the width of the page.
+        pjl.write(ESCAPE + "&l0U")
+        # Top (short-edge) offset registration. Adjusts the position of the
+        # logical page across the length of the page.
+        pjl.write(ESCAPE + "&l0Z")
+        # Resolution of the print.
+        pjl.write(ESCAPE + "&u%dD" % self.resolution)
+        # X position = 0
+        pjl.write(ESCAPE + "*p0X")
+        # Y position = 0
+        pjl.write(ESCAPE + "*p0Y")
+        # PCL resolution
+        pjl.write(ESCAPE + "*t%dR" % self.resolution)
+
+        # If raster power is enabled and raster mode is not 'n' then add that
+        # information to the print job.
+        if self.raster_power and self.raster_mode != 'n':
+            # Unknown purposes.
+            pjl.write(ESCAPE + "&y0C")
+            # Send the raster information.
+            pjl.write(raster.read())
+
+        # If vector power is > 0 then add vector information to the print job.
+        if self.vector_power > 0:
+            pjl.write(ESCAPE + "E@PJL ENTER LANGUAGE=PCL\r\n")
+            # Page orientation
+            pjl.write(ESCAPE + "*r0F")
+            pjl.write(ESCAPE + "*r%dT" % (height * y_repeat))
+            pjl.write(ESCAPE + "*r%dS" % (width * x_repeat))
+            pjl.write(ESCAPE + "*r1A")
+            pjl.write(ESCAPE + "*rC")
+            pjl.write(ESCAPE + "%%1B")
+            # Send the vector information.
+            pjl.write(vector.read())
+
+        # Footer for print job language.
+        pjl.write(ESCAPE + "F")
+        pjl.write(ESCAPE + "%%-12345X")
+        pjl.write("@PJL EOJ \r\n")
+
+        # Pad out the remainder of the file with 0 characters.
+        for i in xrange(0, 4096):
+            pjl.write(0)
+
+        pjl.seek(0)
+        return pjl
 
     def run(self, job):
         super(RasterVector, self).run(job)

@@ -29,6 +29,8 @@ import device
 import ghostscript
 import log
 
+from utils import units_to_pts
+
 
 ###############################################################################
 ## Classes
@@ -85,9 +87,9 @@ class Laser(device.RasterVector):
         self.vector_speed = self.get_option(['vs', 'vector-speed'], default=30)
 
         # Bed width in pts
-        self.bed_width = self.get_option(['w', 'width'], default=1728)
+        self.bed_width = units_to_pts(self.get_option(['w', 'width'], default=1728))
         # Bed height in pts
-        self.bed_height = self.get_option(['h', 'height'], default=864)
+        self.bed_height = units_to_pts(self.get_option(['h', 'height'], default=864))
 
         # Additional offset for the x-axis
         self.offset_x = 0
@@ -122,4 +124,8 @@ class Laser(device.RasterVector):
 
         # send to printer
         log.info('Sending data to printer.')
+        self.send(self.hpgl_pcl_to_pjl(raster, hpgl))
+
+        # Successfully completed printing job.
+        log.info("Job %s printed." % job)
 
