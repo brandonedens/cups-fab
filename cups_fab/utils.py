@@ -33,6 +33,26 @@ from config import config
 
 
 ###############################################################################
+## Constants
+###############################################################################
+
+# Number of pts per an inch.
+PTS_PER_INCH=72
+
+# Number of pts per a foot.
+PTS_PER_INCH=864
+
+# Number of pts per a cm.
+PTS_PER_CM=28.3464567
+
+# Number of pts per a mm
+PTS_PER_MM=2.83464567
+
+# Number of pts oer a meter
+PTS_PER_METER=2834.64567
+
+
+###############################################################################
 ## Functions
 ###############################################################################
 
@@ -110,4 +130,30 @@ def hostname_port(device_name):
     if match:
         # We have a single hostanme
         return (match.group(1), None)
+
+def units_to_pts(units):
+    """
+    Given a units string definition of the form 23pts or 23ins; convert that string to pts.
+    This function accepts:
+    mm
+    cm
+    in
+    pts
+    dpi
+    """
+    try:
+        match = re.search("([\d\.]+) *(in|pt|mm|cm|ft|m)s?", units.lower())
+        if match:
+            if match.group(2) == "in":
+                return int(float(match.group(1)) * PTS_PER_INCH)
+            elif match.group(2) == 'cm':
+                return int(float(match.group(1)) * PTS_PER_CM)
+            elif match.group(2) == 'mm':
+                return int(float(match.group(1)) * PTS_PER_MM)
+            elif match.group(2) == 'm':
+                return int(float(match.group(1)) * PTS_PER_METER)
+            elif match.group(2) == 'pt':
+                return int(match.group(1))
+    except AttributeError:
+        return units
 
