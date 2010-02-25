@@ -110,7 +110,7 @@ class Laser(device.RasterVector):
         # run ghostscript on eps
         log.info('Running ghostscript on eps file.')
         (raster, vector) = ghostscript.execute(eps, self.resolution,
-                                               self.bed_width, self.bed_height,
+                                               self.bed_width/72, self.bed_height/72,
                                                ghostscript.raster_mode_to_ghostscript(self.raster_mode))
 
         # convert image data to pcl
