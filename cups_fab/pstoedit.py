@@ -53,7 +53,8 @@ def execute(in_file,
             "%s" % xscale,
             "-yscale",
             "%s" % yscale,
-            "-"]
+            "-",
+            ]
 
     # Execute pstoedit
     process = subprocess.Popen(args, cwd=config.tmp_dir,
