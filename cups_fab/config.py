@@ -60,8 +60,13 @@ class Config(object):
         # Xscale and Yscale factors
         self.xscale = 1.416666
         self.yscale = 1.416666
-        self.pstoedit_format = 'hpgl:-pen'
+
+        # pstoedit related settings
         self.pstoedit = '/usr/bin/pstoedit'
+        self.pstoedit_format = 'hpgl:-pen'
+
+        # ghostscript related settings
+        self.gs = '/usr/bin/gs'
 
         # Location for temporary files
         self.tmp_dir = '/tmp/'

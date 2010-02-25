@@ -52,7 +52,7 @@ class Job(object):
         self.file = None
         try:
             self.filename = argv[6]
-            log.debug("Cups sent file to print as filename argument %s." % self.filename)
+            log.debug("Loadings cups data from file at %s." % self.filename)
             self.file = open(self.filename, 'r+b')
         except IndexError:
             if config.debug:
