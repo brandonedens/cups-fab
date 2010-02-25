@@ -20,6 +20,13 @@
 # along with cups_fab. If not, see <http://www.gnu.org/licenses/>.
 """
 Main entry point for vinyl cutter printing.
+
+
+WARNING WARNING:
+
+This executable must have permissions set to 0700 in order to force cups to
+execute it as root which allows us to open the job information in
+/var/spool/cups/.
 """
 
 ###############################################################################
@@ -61,5 +68,4 @@ if __name__ == '__main__':
         traceback.print_exc()
         log.crit("Unexpected failure %s." % e)
         sys.exit(1)
-
 
