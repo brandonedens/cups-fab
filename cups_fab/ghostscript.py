@@ -66,11 +66,13 @@ def execute(in_file, resolution, width, height, raster_mode):
             "-",
             ]
     # Execute ghostscript
+    log.debug("Opening ghostscript process with args: %s" % args)
     process = subprocess.Popen(args, cwd=config.tmp_dir,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE,
                                stdin=subprocess.PIPE)
     (stdoutdata, stderrdata) = process.communicate(in_file.read())
+    log.debug("Waiting on ghostscript to terminate.")
     process.wait()
 
     # Check that ghostscript functioned correctly.
@@ -79,16 +81,19 @@ def execute(in_file, resolution, width, height, raster_mode):
                  % process.returncode)
 
     # Get raster information into a StringIO
+    log.debug("Rewinding the ghostscript raster output and storing it in StringIO")
     raster_tmpfile.seek(0)
     raster = StringIO()
     raster.write(raster_tmpfile.read())
     raster.seek(0)
 
     # Gather the vector information into a StringIO
+    log.debug("Gathering the vector output from ghostscript.")
     vector = StringIO()
     vector.write(stdoutdata)
     vector.seek(0)
 
+    log.debug("Returning ghostscript raster and vector output.")
     return (raster, vector)
 
 def raster_mode_to_ghostscript(mode):
