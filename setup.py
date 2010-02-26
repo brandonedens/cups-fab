@@ -20,7 +20,10 @@ Python cups backend for printing to HPGL devices.""",
       install_requires=[
           # -*- Extra requirements: -*-
       ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
-      )
+      entry_points={
+          'console_scripts': [
+              'laser-cutter = cups_fab.laser_cutter:main',
+              'vinyl-cutter = cups_fab.vinyl_cutter:main',
+              ],
+      }
+)
