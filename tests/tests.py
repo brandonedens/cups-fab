@@ -24,61 +24,17 @@ Unit testing files.
 ## Imports
 ###############################################################################
 
-import sys
-import tempfile
 import unittest
+import sys
 
-from cups_fab.job import Job
-
-
-###############################################################################
-## Constants
-###############################################################################
+from job_test import JobTest
+from ghostscript_test import GhostscriptTest
 
 
 ###############################################################################
-## Classes
+## Statements
 ###############################################################################
 
-class GhostscriptTest(unittest.TestCase):
-    def setUp(self):
-        pass
-
-class JobTest(unittest.TestCase):
-
-    def setUp(self):
-        pass
-
-    def testInit(self):
-        """Test that job loads argv arguments."""
-        argv = ["executable", "123", "jdoe", "example.ps", "1", "options"]
-        job = Job(argv)
-        self.assertEqual(job.number, '123')
-        self.assertEqual(job.user, 'jdoe')
-        self.assertEqual(job.title, 'example.ps')
-        self.assertEqual(job.copies, '1')
-        self.assertEqual(job.file, sys.stdin)
-
-    def testInitWithFile(self):
-        """Test that job loads argv arguments with filename."""
-        fake_input = tempfile.NamedTemporaryFile()
-        argv = ["executable", "123", "jdoe", "example.ps", "1", "options", fake_input.name]
-        job = Job(argv)
-        fake_input.close()
-
-    def testStr(self):
-        """Test that job presents correct string information."""
-        argv = ["executable", "123", "jdoe", "example.ps", "1", "options"]
-        job = Job(argv)
-        self.assertEqual(job.__str__(),
-                         'number 123 named example.ps for user jdoe')
-
-
-
-
-###############################################################################
-## Functions
-###############################################################################
 
 if __name__ == '__main__':
     unittest.main()
