@@ -1,5 +1,5 @@
 Metadata-Version: 1.0
-Name: print-hpgl
+Name: cups-fab
 Version: 0.1dev
 Summary: Python cups backend for HPGL printing.
 Home-page: http://as220.org/git/gitweb/
