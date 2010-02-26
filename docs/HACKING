@@ -51,6 +51,16 @@ Here's some commands for manually running the laser cutter::
   export PRINTER='laser-cutter'
   ./bin/laser-cutter 123 jdoe test 1 options < ~/test.ps
 
+Capturing job sent to the manual laser cutter
+---------------------------------------------
+
+You can use netcat the TCP/IP swiss army knife to capture incoming cups
+jobs. Try doing something like::
+
+  nc -k -l localhost 6001
+
+to capture network traffic coming to the printer.
+
 
 Cups Log Messages
 =================
@@ -60,15 +70,27 @@ here: http://www.cups.org/documentation.php/api-filter.html#MESSAGES
 
 In Python that means that your log messages need to be sent via stderr with the
 proper preface to each message. As in::
+
   sys.stderr.write("INFO: I am trying to raster!\n")
   sys.stderr.crit("CRIT: I tried to foo but broke!\n")
 
 To that end cups_fab provides a log.py file that can be used to emit the proper
 messages. So to emit info messages to be displayed for information use::
+
   log.info("Hello world")
 
 To display error messages try::
+
   log.crit("Could not open file %s." % filename)
+
+You can view these log messages by looking at the filename::
+
+  /var/log/cups/error_log
+
+To get reasonable logging you might need to increase cups log level. You can do
+that by modifying the configuration value LogLevel in::
+
+  /etc/cups/cups.conf
 
 
 Cups Security
@@ -106,10 +128,17 @@ width/height.
 For our laser cutter with bed size 24x12 the jobs come in with height 24in and
 width 12in.
 
-The work around is to define an accepted page size in our driver then when
-spotting documents submitted with that size rotated, to unrotate the page via
-postscript. Our drivers attempt to do this but it must be known that documents
-that are sent to our driver without the correct page size will not be properly
-adjusted back to the right orientation. There is no good workaround beyond this
-at this time.
+There are two ways of working around this. The first is jobs sent to a vinyl
+cutter need to make sure that the define a height that is greater than the
+width. This makes sense in that vinyl rolls are usually always longer than they
+are wider and most users will do this by default.
+
+The other work around is to define an accepted page size in our driver then
+when spotting documents submitted with that size rotated, to unrotate the page
+via postscript. Our drivers attempt to do this but it must be known that
+documents that are sent to our driver without the correct page size will not be
+properly adjusted back to the right orientation.
+
+Obviously it'd be great if we could spot pages orientated into landscape mode
+then convert them back to Portrait. This just isn't possible at this time.
 
