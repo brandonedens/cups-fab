@@ -27,7 +27,7 @@ Script executes the cups_fab test suite.
 ## Imports
 ###############################################################################
 import sys
-import os
+from os import path
 
 sys.path.insert(0, path.join(path.dirname(__file__), path.pardir))
 try:
