@@ -8,7 +8,7 @@ setup(name='cups_fab',
       description="Python cups backend for HPGL printing.",
       long_description="""\
 Python cups backend for printing to HPGL devices.""",
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=[],
       keywords='hpgl cups',
       author='Brandon Edens',
       author_email='brandon@as220.org',
