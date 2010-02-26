@@ -38,11 +38,6 @@ from device import Device
 ## Constants
 ###############################################################################
 
-BOUNDING_BOX_PS = "/==={(        )cvs print}def/stroke{currentrgbcolor 0.0 \
-eq exch 0.0 eq and exch 0.0 ne and{(P)=== currentrgbcolor pop pop 100 mul \
-round  cvi = flattenpath{transform(M)=== round cvi ===(,)=== round cvi \
-=}{transform(L)=== round cvi ===(,)=== round cvi =}{}{(C)=}pathforall \
-newpath}{stroke}ifelse}bind def/showpage{(X)= showpage}bind def\n"
 
 # The escape character.
 ESCAPE = "\e"
@@ -157,72 +152,6 @@ class RasterVector(Device):
 
         pcl.seek(0)
         return pcl
-
-    def ps_to_eps(self, in_file):
-        """
-        Convert a postscript file to an EPS file. This function adds additional
-        information after the PageBoundingBox entry. It also makes adjustment
-        to the postscript if the raster_mode is mono AND (screen mode is a
-        value other than 0 OR resolution is higher than 600)
-        """
-        out = StringIO()
-        for line in in_file.readlines():
-            out.write(line)
-            if line.startswith('%%PageBoundingBox:'):
-                match = re.search("%%PageBoundingBox: (\d+) (\d+) (\d+) (\d+)",
-                                  line)
-                groups = match.groups(1)
-                lower_left_x = int(groups[0])
-                lower_left_y = int(groups[1])
-                upper_right_x = int(groups[2])
-                upper_right_y = int(groups[3])
-
-                xoffset = lower_left_x
-                yoffset = lower_left_y
-                width = upper_right_x - lower_left_x
-                height = upper_right_y - lower_left_y
-
-                out.write('/setpagedevice{pop}def\n')
-
-                # Bugfix for document sent rotated from say Inkscape/Cairo
-                if self.width == height and self.height == width:
-                    # We have a rotated document because the incoming
-                    # postscript height is set to what we would expect the
-                    # bed_width to be..
-                    out.write("-90 rotate")
-                    tmp = width
-                    width = height
-                    height = tmp
-
-                # Bugfix for situation where x,y offset is non 0
-                if xoffset or yoffset:
-                    out.write("%d %d translate\n", -xoffset, -yoffset)
-
-                # Adjust for situation where user wants flip.
-                if self.flip:
-                    out.write("%d 0 translate -1 1 scale\n" % width)
-
-            elif line.startswith('%!'):
-                out.write(BOUNDING_BOX_PS)
-                if self.raster_mode == 'mono':
-                    if self.screen == 0:
-                        out.write('{0.5 ge{1}{0}ifelse}settransfer\n')
-                    else:
-                        if self.resolution >= 600:
-                            # Adjust for overprint
-                            out.write("{dup 0 ne{%d %d div add}if}settransfer\n"
-                                      % self.resolution / 600, self.screen)
-                        # Setup the mono raster screen mode.
-                        out.write("%d " % self.resolution / self.screen)
-                        if self.screen > 0:
-                            out.write("30{pop abs 1 exch sub}")
-                        else:
-                            out.write(
-                                "30{180 mul cos exch 180 mul cos add 2 div}"
-                                )
-                        out.write("setscreen\n")
-        out.seek(0)
-        return out
 
     def run(self, job):
         """

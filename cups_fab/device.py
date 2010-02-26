@@ -44,6 +44,11 @@ from config import config
 class Device(object):
 
     def __init__(self, device_uri):
+        self.device_class = "direct"
+        self.device_uri = "device"
+        self.device_make_and_model = "Unknown"
+        self.device_info = "Generic device that does nothing"
+
         log.info('Parsing device options.')
         match = re.search('([A-Za-z\-0-9]+)://([A-Za-z\-0-9.]+)/(.*)',
                           device_uri)
@@ -96,6 +101,12 @@ class Device(object):
                     pass
                 # Handle values all other values.
                 self.options[key] = value
+
+    def __str__(self):
+        return "%s %s \"%s\" \"%s\"\n" % (self.device_class,
+                                          self.device_uri,
+                                          self.device_make_and_model,
+                                          self.device_info)
 
     def get_option(self, keys, default=None):
         """

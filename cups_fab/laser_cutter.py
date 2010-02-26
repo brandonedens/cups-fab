@@ -35,6 +35,7 @@ import log
 
 from raster_vector import RasterVector
 from job import Job
+from postscript import ps_to_eps
 from utils import units_to_pts
 
 
@@ -60,6 +61,10 @@ class Laser(RasterVector):
         Initialize the laser cutter device.
         """
         super(Laser, self).__init__(device_uri)
+
+        # Setup laser cutter specific cups settings.
+        self.device_make_and_model = "Generic Laser Cutter"
+        self.device_info = "Laser Cutter (thin red lines vector cut)"
 
         # Whether or not to auto-focus the laser.
         self.auto_focus = self.get_option(['af', 'auto-focus'], default=True)
@@ -193,7 +198,7 @@ class Laser(RasterVector):
 
         # Convert postscript to eps.
         log.info('Converting input postscript to EPS.')
-        eps = self.ps_to_eps(job.file)
+        eps = ps_to_eps(job.file)
 
         # run ghostscript on eps
         log.info('Running ghostscript on eps file.')
@@ -223,19 +228,15 @@ def main():
     Main entry for laser cutter program.
     """
     try:
-        if len(sys.argv) == 1:
-            device_class = "direct"
-            device_uri = os.path.basename(sys.argv[0])
-            device_make_and_model = "Unknown"
-            device_info = "Laser Cutter (thin red lines vector cut)"
-            print "%s %s \"%s\" \"%s\"\n" % (device_class,
-                                             device_uri,
-                                             device_make_and_model,
-                                             device_info)
-            sys.exit(1)
-
         job = Job(sys.argv)
         printer = Laser(os.getenv('DEVICE_URI'))
+
+        if len(sys.argv) == 1:
+            # Set the device uri to the script name.
+            printer.device_uri = os.path.basename(sys.argv[0])
+            print printer
+            sys.exit(1)
+
         printer.run(job)
         sys.exit(0)
     except Exception as e:
