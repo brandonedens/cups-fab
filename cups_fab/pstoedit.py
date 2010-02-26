@@ -28,7 +28,6 @@ postscript/pdf to a vector format.
 from cStringIO import StringIO
 import log
 import subprocess
-import sys
 
 from config import config
 

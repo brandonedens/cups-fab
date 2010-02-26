@@ -1,5 +1,5 @@
 # Brandon Edens
-# 2010-02-12
+# 2010-02-26
 # Copyright (C) 2010 Brandon Edens <brandon@as220.org>
 #
 # This file is part of cups_fab.
@@ -17,32 +17,53 @@
 # You should have received a copy of the GNU General Public License
 # along with cups_fab. If not, see <http://www.gnu.org/licenses/>.
 """
-Functions related to logging messages to cups.
+Software specific to printing to a vinyl cutter.
 """
 
 ###############################################################################
 ## Imports
 ###############################################################################
+
+import os
 import sys
+import traceback
+
+import log
+from job import Job
+from vector import Vector
+
+
+###############################################################################
+## Constants
+###############################################################################
+
+
+###############################################################################
+## Classes
+###############################################################################
 
 
 ###############################################################################
 ## Functions
 ###############################################################################
 
-def crit(message):
-    sys.stderr.write("CRIT: %s\n" % message)
+def main():
+    """
+    Main entry of vinyl cutter program.
+    """
+    try:
+        if len(sys.argv) == 1:
+            program_name = os.path.basename(sys.argv[0])
+            print "direct %s \"Unknown\" \"Vinyl Cutter (thin red lines vector cut)\"\n" % program_name
+            sys.exit(1)
 
-def error(message):
-    sys.stderr.write("ERROR: %s\n" % message)
-
-def warning(message):
-    sys.stderr.write("WARNING: %s\n" % message)
-
-def info(message):
-    sys.stderr.write("INFO: %s\n" % message)
-
-def debug(message):
-    sys.stderr.write("DEBUG: %s\n" % message)
+        job = Job(sys.argv)
+        printer = Vector(os.getenv('DEVICE_URI'))
+        printer.run(job)
+        sys.exit(0)
+    except Exception as e:
+        traceback.print_exc()
+        log.crit("Unexpected failure %s." % e)
+        sys.exit(1)
 
 

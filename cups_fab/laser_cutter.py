@@ -17,32 +17,47 @@
 # You should have received a copy of the GNU General Public License
 # along with cups_fab. If not, see <http://www.gnu.org/licenses/>.
 """
+File that defines functionality specific to laser cutters. This file builds off
+of the generic device RasterVector().
 """
 
 ###############################################################################
 ## Imports
 ###############################################################################
 
-import re
+import os
+import sys
+import traceback
+from cStringIO import StringIO
 
-import device
 import ghostscript
 import log
 
+from raster_vector import RasterVector
+from job import Job
 from utils import units_to_pts
+
+
+###############################################################################
+## Constants
+###############################################################################
+
+# The escape character.
+ESCAPE = "\e"
 
 
 ###############################################################################
 ## Classes
 ###############################################################################
 
-class Laser(device.RasterVector):
+class Laser(RasterVector):
     """
     Generic laser cutter.
     """
 
     def __init__(self, device_uri):
         """
+        Initialize the laser cutter device.
         """
         super(Laser, self).__init__(device_uri)
 
@@ -87,23 +102,83 @@ class Laser(device.RasterVector):
         self.vector_speed = self.get_option(['vs', 'vector-speed'], default=30)
 
         # Bed width in pts
-        self.bed_width = units_to_pts(self.get_option(['w', 'width'], default=1728))
+        self.width = units_to_pts(self.get_option(['w', 'width'], default=1728))
         # Bed height in pts
-        self.bed_height = units_to_pts(self.get_option(['h', 'height'], default=864))
+        self.height = units_to_pts(self.get_option(['h', 'height'], default=864))
 
         # Additional offset for the x-axis
         self.offset_x = 0
         self.offset_y = 0
 
+    def hpgl_pcl_to_pjl(self, job, hpgl, pcl):
+        """
+        Convert HPGL+PCL data to printer job language (pjl).
+
+        The parameter job is the print job currently being executed.
+        hpgl is the hpgl data to send.
+        pcl is the pcl data to send.
+        """
+        pjl = StringIO()
+
+        # Print the printer job language header.
+        pjl.write(ESCAPE + "%%-12345X@PJL JOB NAME=%s\r\n" % job.job_title)
+        pjl.write(ESCAPE + "E@PJL ENTER LANGUAGE=PCL\r\n")
+        # Set autofocus on or off.
+        pjl.write(ESCAPE + "&y%dA" % self.auto_focus)
+        # Left (long-edge) offset registration. Adjusts the position of the
+        # logical page across the width of the page.
+        pjl.write(ESCAPE + "&l0U")
+        # Top (short-edge) offset registration. Adjusts the position of the
+        # logical page across the length of the page.
+        pjl.write(ESCAPE + "&l0Z")
+        # Resolution of the print.
+        pjl.write(ESCAPE + "&u%dD" % self.resolution)
+        # X position = 0
+        pjl.write(ESCAPE + "*p0X")
+        # Y position = 0
+        pjl.write(ESCAPE + "*p0Y")
+        # PCL resolution
+        pjl.write(ESCAPE + "*t%dR" % self.resolution)
+
+        # If raster power is enabled and raster mode is not 'n' then add that
+        # information to the print job.
+        if self.raster_power and self.raster_mode != 'n':
+            # Unknown purposes.
+            pjl.write(ESCAPE + "&y0C")
+            # Send the pcl information.
+            pjl.write(pcl.read())
+
+        # If vector power is > 0 then add vector information to the print job.
+        if self.vector_power > 0:
+            pjl.write(ESCAPE + "E@PJL ENTER LANGUAGE=PCL\r\n")
+            # Page orientation
+            pjl.write(ESCAPE + "*r0F")
+            # XXX fixme this needs better porting
+            #pjl.write(ESCAPE + "*r%dT" % (self.height * y_repeat))
+            #pjl.write(ESCAPE + "*r%dS" % (self.width * x_repeat))
+            pjl.write(ESCAPE + "*r1A")
+            pjl.write(ESCAPE + "*rC")
+            pjl.write(ESCAPE + "%%1B")
+            # Send the vector information.
+            pjl.write(hpgl.read())
+
+        # Footer for print job language.
+        pjl.write(ESCAPE + "F")
+        pjl.write(ESCAPE + "%%-12345X")
+        pjl.write("@PJL EOJ \r\n")
+
+        # Pad out the remainder of the file with 0 characters.
+        for i in xrange(0, 4096):
+            pjl.write(0)
+
+        pjl.seek(0)
+        return pjl
+
     def run(self, job):
         """
+        Execute the process of sending a job to the laser cutter.
         """
         super(Laser, self).run(job)
-
-        # Address potential rotation problems in the given postscript by making
-        # sure that if passed print job is same size as the defined bed then we
-        # rotate document to same coordinates.
-        # XXX fixme
 
         # Convert postscript to eps.
         log.info('Converting input postscript to EPS.')
@@ -112,11 +187,12 @@ class Laser(device.RasterVector):
         # run ghostscript on eps
         log.info('Running ghostscript on eps file.')
         (raster, vector) = ghostscript.execute(eps, self.resolution,
-                                               self.bed_width/72, self.bed_height/72,
+                                               self.width, self.height,
                                                ghostscript.raster_mode_to_ghostscript(self.raster_mode))
 
         # convert image data to pcl
         log.info('Converting image data to PCL.')
+        pcl = self.raster_to_pcl(raster)
 
         # convert vector data to hpgl
         log.info('Converting ghostscript vector data to HPGL')
@@ -124,8 +200,28 @@ class Laser(device.RasterVector):
 
         # send to printer
         log.info('Sending data to printer.')
-        self.send(self.hpgl_pcl_to_pjl(raster, hpgl))
+        self.send(self.hpgl_pcl_to_pjl(job, hpgl, pcl))
 
         # Successfully completed printing job.
         log.info("Job %s printed." % job)
+
+
+def main():
+    """
+    Main entry for laser cutter program.
+    """
+    try:
+        if len(sys.argv) == 1:
+            program_name = os.path.basename(sys.argv[0])
+            print "direct %s \"Unknown\" \"Laser Cutter (thin red lines vector cut)\"\n" % program_name
+            sys.exit(1)
+
+        job = Job(sys.argv)
+        printer = Laser(os.getenv('DEVICE_URI'))
+        printer.run(job)
+        sys.exit(0)
+    except Exception as e:
+        traceback.print_exc()
+        log.crit("Unexpected failure %s." % e)
+        sys.exit(1)
 

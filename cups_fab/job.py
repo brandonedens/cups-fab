@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with cups_fab. If not, see <http://www.gnu.org/licenses/>.
 """
+Software that represents a CUPS job. This software is specific to the
+DEVICE_URI environment variable that cups provides.
 """
 
 ###############################################################################
@@ -24,10 +26,8 @@
 ###############################################################################
 
 import sys
-from cStringIO import StringIO
 
 import log
-from config import config
 
 
 ##############################################################################
@@ -55,14 +55,9 @@ class Job(object):
             log.debug("Loadings cups data from file at %s." % self.filename)
             self.file = open(self.filename, 'r+b')
         except IndexError:
-            if config.debug:
-                log.debug('Loading cups data via stdin and creating StringIO to hold file text.')
-                self.file = StringIO()
-                self.file.write(sys.stdin.read())
-                self.file.seek(0)
-            else:
-                self.file = sys.stdin
-                log.debug('Cups did not specify input filename. Using stdin.')
+            log.debug('Input file not specified.')
+            log.debug('Loading cups data from stdin.')
+            self.file = sys.stdin
 
     def __str__(self):
         return "number %s named %s for user %s" % (self.number, self.title, self.user)

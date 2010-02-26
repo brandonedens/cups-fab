@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with cups_fab. If not, see <http://www.gnu.org/licenses/>.
 """
+File that defines handling of external program ghostscript.
 """
 
 ###############################################################################
 ## Imports
 ###############################################################################
 
-import re
 import subprocess
 import tempfile
 from cStringIO import StringIO
@@ -33,27 +33,22 @@ from config import config
 
 
 ###############################################################################
-## Constants
-###############################################################################
-
-
-###############################################################################
-## Classes
-###############################################################################
-
-
-###############################################################################
 ## Functions
 ###############################################################################
 
 def execute(in_file, resolution, width, height, raster_mode):
     """
+    Execute the ghostscript command on the given in_file generating out raster
+    and vector information with the given resolution.
+    Width and height should be specified in pts.
+    Raster_mode is one of: none, mono, grey, color
     """
 
     raster_tmpfile = tempfile.NamedTemporaryFile()
 
-    width = width * resolution
-    height = height * resolution
+    # Convert width and height to DPI.
+    width = (width/72) * resolution
+    height = (height/72) * resolution
 
     args = [config.gs,
             "-q",
@@ -83,9 +78,7 @@ def execute(in_file, resolution, width, height, raster_mode):
     # Get raster information into a StringIO
     log.debug("Rewinding the ghostscript raster output and storing it in StringIO")
     raster_tmpfile.seek(0)
-    raster = StringIO()
-    raster.write(raster_tmpfile.read())
-    raster.seek(0)
+    raster = raster_tmpfile
 
     # Gather the vector information into a StringIO
     log.debug("Gathering the vector output from ghostscript.")

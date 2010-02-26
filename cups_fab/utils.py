@@ -17,6 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with cups_fab. If not, see <http://www.gnu.org/licenses/>.
 """
+Utilities for cups_fab. This consists of short functions that accomplish small
+tasks ranging from checking serial connections, host connections to converting
+a string representation of some length to a length in postscript points.
 """
 
 ###############################################################################
@@ -29,7 +32,6 @@ import socket
 import stat
 
 import log
-from config import config
 
 
 ###############################################################################
@@ -37,19 +39,19 @@ from config import config
 ###############################################################################
 
 # Number of pts per an inch.
-PTS_PER_INCH=72
+PTS_PER_INCH = 72
 
 # Number of pts per a foot.
-PTS_PER_INCH=864
+PTS_PER_INCH = 864
 
 # Number of pts per a cm.
-PTS_PER_CM=28.3464567
+PTS_PER_CM = 28.3464567
 
 # Number of pts per a mm
-PTS_PER_MM=2.83464567
+PTS_PER_MM = 2.83464567
 
 # Number of pts oer a meter
-PTS_PER_METER=2834.64567
+PTS_PER_METER = 2834.64567
 
 
 ###############################################################################
