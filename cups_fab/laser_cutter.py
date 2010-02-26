@@ -74,37 +74,48 @@ class Laser(RasterVector):
         # grey = grey-scale levels determine power level
         # mono = mono with half-toning
         # none = no rasterizatino
-        self.raster_mode = self.get_option(['rm', 'raster-mode'], default='grey')
+        self.raster_mode = self.get_option(['rm', 'raster-mode'],
+                                           default='grey')
 
         # Default raster power level (0-100)
-        self.raster_power = self.get_option(['rp', 'raster-power'], default=40)
+        self.raster_power = self.get_option(['rp', 'raster-power'],
+                                            default=40)
         # Default on whether to repeat the raster stage. This is the
         # number of times to raster the same image.
-        self.raster_repeat = self.get_option(['rr', 'raster-repeat'], default=0)
+        self.raster_repeat = self.get_option(['rr', 'raster-repeat'],
+                                             default=0)
         # Default raster speed (0-100)
-        self.raster_speed = self.get_option(['rs', 'raster-speed'], default=100)
+        self.raster_speed = self.get_option(['rs', 'raster-speed'],
+                                            default=100)
 
         # Default resolution in dots per inch (DPI)
         # 75 - 1200 dpi
-        self.resolution = self.get_option(['r', 'resolution'], default=600)
+        self.resolution = self.get_option(['r', 'resolution'],
+                                          default=600)
 
         # Default raster halftone screen (the size of halftone blocks)
         # Another interesting value is -6
-        self.raster_halftone_screen = self.get_option(['s', 'screen'], default=8)
+        self.raster_halftone_screen = self.get_option(['s', 'screen'],
+                                                      default=8)
 
         # Default vectory frequency (in Hz) or the number of times
         # that the laser turns on per a second
         # 500 or 5000 are quite common
-        self.vector_frequency = self.get_option(['vf', 'vector-frequency'], default=500)
+        self.vector_frequency = self.get_option(['vf', 'vector-frequency'],
+                                                default=500)
         # Default vector power (0-100)
-        self.vector_power = self.get_option(['vp', 'vector-power'], default=50)
+        self.vector_power = self.get_option(['vp', 'vector-power'],
+                                            default=50)
         # Default vector speed (0-100)
-        self.vector_speed = self.get_option(['vs', 'vector-speed'], default=30)
+        self.vector_speed = self.get_option(['vs', 'vector-speed'],
+                                            default=30)
 
         # Bed width in pts
-        self.width = units_to_pts(self.get_option(['w', 'width'], default=1728))
+        self.width = units_to_pts(self.get_option(['w', 'width'],
+                                                  default=1728))
         # Bed height in pts
-        self.height = units_to_pts(self.get_option(['h', 'height'], default=864))
+        self.height = units_to_pts(self.get_option(['h', 'height'],
+                                                   default=864))
 
         # Additional offset for the x-axis
         self.offset_x = 0
@@ -186,9 +197,10 @@ class Laser(RasterVector):
 
         # run ghostscript on eps
         log.info('Running ghostscript on eps file.')
-        (raster, vector) = ghostscript.execute(eps, self.resolution,
-                                               self.width, self.height,
-                                               ghostscript.raster_mode_to_ghostscript(self.raster_mode))
+        (raster, vector) = ghostscript.execute(
+            eps, self.resolution,
+            self.width, self.height,
+            ghostscript.raster_mode_to_ghostscript(self.raster_mode))
 
         # convert image data to pcl
         log.info('Converting image data to PCL.')
@@ -212,8 +224,14 @@ def main():
     """
     try:
         if len(sys.argv) == 1:
-            program_name = os.path.basename(sys.argv[0])
-            print "direct %s \"Unknown\" \"Laser Cutter (thin red lines vector cut)\"\n" % program_name
+            device_class = "direct"
+            device_uri = os.path.basename(sys.argv[0])
+            device_make_and_model = "Unknown"
+            device_info = "Laser Cutter (thin red lines vector cut)"
+            print "%s %s \"%s\" \"%s\"\n" % (device_class,
+                                             device_uri,
+                                             device_make_and_model,
+                                             device_info)
             sys.exit(1)
 
         job = Job(sys.argv)

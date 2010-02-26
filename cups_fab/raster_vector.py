@@ -162,14 +162,15 @@ class RasterVector(Device):
         """
         Convert a postscript file to an EPS file. This function adds additional
         information after the PageBoundingBox entry. It also makes adjustment
-        to the postscript if the raster_mode is mono AND (screen mode is a value other
-        than 0 OR resolution is higher than 600)
+        to the postscript if the raster_mode is mono AND (screen mode is a
+        value other than 0 OR resolution is higher than 600)
         """
         out = StringIO()
         for line in in_file.readlines():
             out.write(line)
             if line.startswith('%%PageBoundingBox:'):
-                match = re.search("%%PageBoundingBox: (\d+) (\d+) (\d+) (\d+)", line)
+                match = re.search("%%PageBoundingBox: (\d+) (\d+) (\d+) (\d+)",
+                                  line)
                 groups = match.groups(1)
                 lower_left_x = int(groups[0])
                 lower_left_y = int(groups[1])
@@ -209,13 +210,17 @@ class RasterVector(Device):
                     else:
                         if self.resolution >= 600:
                             # Adjust for overprint
-                            out.write("{dup 0 ne{%d %d div add}if}settransfer\n" % self.resolution / 600, self.screen)
+                            out.write("{dup 0 ne{%d %d div add}if}settransfer\n"
+                                      % self.resolution / 600, self.screen)
                         # Setup the mono raster screen mode.
                         out.write("%d " % self.resolution / self.screen)
                         if self.screen > 0:
-                            out.write("30{pop abs 1 exch sub}setscreen\n")
+                            out.write("30{pop abs 1 exch sub}")
                         else:
-                            out.write("30{180 mul cos exch 180 mul cos add 2 div}setscreen\n")
+                            out.write(
+                                "30{180 mul cos exch 180 mul cos add 2 div}"
+                                )
+                        out.write("setscreen\n")
         out.seek(0)
         return out
 

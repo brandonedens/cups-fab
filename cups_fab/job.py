@@ -60,7 +60,9 @@ class Job(object):
             self.file = sys.stdin
 
     def __str__(self):
-        return "number %s named %s for user %s" % (self.number, self.title, self.user)
+        return "number %s named %s for user %s" % (self.number,
+                                                   self.title,
+                                                   self.user)
 
 
 ###############################################################################

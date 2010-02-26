@@ -56,9 +56,10 @@ class Vector(Device):
 
         if config.debug:
             # Debug is enabled so dump hpgl to filesystem.
-            out_filename = config.tmp_dir+"%s_%s_%s.hpgl" % (os.getenv('PRINTER'),
-                                                             job.number,
-                                                             os.getpid())
+            hpgl_file = "%s_%s_%s.hpgl" % (os.getenv('PRINTER'),
+                                           job.number,
+                                           os.getpid())
+            out_filename = config.tmp_dir + hpgl_file
             out_file = open(out_filename, 'w')
             os.fchmod(out_file.fileno(), 0666)
             out_file.write(hpgl)

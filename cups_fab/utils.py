@@ -135,13 +135,14 @@ def hostname_port(device_name):
 
 def units_to_pts(units):
     """
-    Given a units string definition of the form 23pts or 23ins; convert that string to pts.
+    Given a units string definition of the form 23pts or 23ins; convert that
+    string to pts.
     This function accepts:
-    mm
-    cm
-    in
-    pts
-    dpi
+    * mm
+    * cm
+    * in
+    * pts
+    * dpi
     """
     try:
         match = re.search("([\d\.]+) *(in|pt|mm|cm|ft|m)s?", units.lower())

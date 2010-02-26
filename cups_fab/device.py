@@ -45,7 +45,8 @@ class Device(object):
 
     def __init__(self, device_uri):
         log.info('Parsing device options.')
-        match = re.search('([A-Za-z\-0-9]+)://([A-Za-z\-0-9.]+)/(.*)', device_uri)
+        match = re.search('([A-Za-z\-0-9]+)://([A-Za-z\-0-9.]+)/(.*)',
+                          device_uri)
         # First parameter is the backend name.
         self.backend = match.group(1)
         # Second parameter is the name of either the serial or network device
@@ -63,15 +64,17 @@ class Device(object):
             self.serial = filename
         elif utils.is_host(self.name):
             self.host, self.port = utils.hostname_port(self.name)
-            if self.port == None:
+            if not self.port:
                 log.debug("Port information not provided in device name.")
-                log.debug("Setting socket port to default %d." % config.socket_port)
+                log.debug("Setting socket port to default %d."
+                          % config.socket_port)
                 self.port = config.socket_port
         else:
             log.crit("Device named %s is neither serial not host." % self.name)
             sys.exit(1)
 
-        match = re.search('([A-Za-z\-0-9]+)://([A-Za-z\-0-9.]+)/(.*)', device_uri)
+        match = re.search('([A-Za-z\-0-9]+)://([A-Za-z\-0-9.]+)/(.*)',
+                          device_uri)
         settings = match.group(3).split('/')
         self.options = {}
         for option in settings:
@@ -124,7 +127,8 @@ class Device(object):
         elif self.serial:
             self.send_serial(data)
         else:
-            log.crit("Could not send data to device as it is neither a host or serial.")
+            log.crit("Failed to send data to device.")
+            log.crit("Device specified is attached via network or serial.")
             sys.exit(1)
 
     def send_network(self, data):
@@ -133,7 +137,8 @@ class Device(object):
         """
         log.info("Sending data via network to %s." % self.name)
         # Open the socket
-        sock = socket.create_connection((self.host, self.port), config.socket_timeout)
+        sock = socket.create_connection((self.host, self.port),
+                                        config.socket_timeout)
         # Send data to the socket
         try:
             sock.sendall(data)
@@ -169,12 +174,14 @@ class Device(object):
 
         if config.debug:
             # Debug is enabled so output cups input file information
-            out_filename = config.tmp_dir+"%s_%s_%s.cups" % (os.getenv('PRINTER'),
-                                                             job.number,
-                                                             os.getpid())
+            cups_filename = "%s_%s_%s.cups" % (os.getenv('PRINTER'),
+                                               job.number,
+                                               os.getpid())
+            out_filename = config.tmp_dir + cups_filename
             out_file = open(out_filename, 'w')
             os.fchmod(out_file.fileno(), 0666)
-            log.debug("Debug enabled so dumping input from cups to file %s." % out_file.name)
+            log.debug("Debug enabled so dumping input from cups to file %s."
+                      % out_file.name)
             job.file.seek(0)
             out_file.write(job.file.read())
             out_file.close()

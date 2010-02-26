@@ -72,11 +72,11 @@ def execute(in_file, resolution, width, height, raster_mode):
 
     # Check that ghostscript functioned correctly.
     if process.returncode != 0:
-        log.crit("Process ghostscript failed during execution with returncode = %s."
+        log.crit("Ghostscript failed during execution with returncode = %s."
                  % process.returncode)
 
     # Get raster information into a StringIO
-    log.debug("Rewinding the ghostscript raster output and storing it in StringIO")
+    log.debug("Rewinding ghostscript raster output and storing it in StringIO")
     raster_tmpfile.seek(0)
     raster = raster_tmpfile
 

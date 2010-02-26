@@ -65,7 +65,7 @@ def execute(in_file,
 
     # Check that pstoedit functioned correctly.
     if process.returncode != 0:
-        log.crit("Process pstoedit failed during execution with returncode = %s."
+        log.crit("pstoedit failed during execution with returncode = %s."
                  % process.returncode)
         # Printing out stdout and stderr
         log.debug("Standard output for pstoedit was:")

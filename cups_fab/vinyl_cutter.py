@@ -53,8 +53,14 @@ def main():
     """
     try:
         if len(sys.argv) == 1:
-            program_name = os.path.basename(sys.argv[0])
-            print "direct %s \"Unknown\" \"Vinyl Cutter (thin red lines vector cut)\"\n" % program_name
+            device_class = "direct"
+            device_uri = os.path.basename(sys.argv[0])
+            device_make_and_model = "Unknown"
+            device_info = "Vinyl Cutter (thin red lines vector cut)"
+            print "%s %s \"%s\" \"%s\"\n" % (device_class,
+                                             device_uri,
+                                             device_make_and_model,
+                                             device_info)
             sys.exit(1)
 
         job = Job(sys.argv)
