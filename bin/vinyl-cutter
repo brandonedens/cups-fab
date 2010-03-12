@@ -52,9 +52,10 @@ if __name__ == '__main__':
     try:
         printer = VinylCutter()
         if len(sys.argv) == 1:
+            print 'direct vinyl-cutter "Generic Vinyl Cutter" "Vinyl Cutter (thin red lines vector cut)"'
             # Set the device uri to the script name.
-            printer.device_uri = os.path.basename(sys.argv[0])
-            print printer
+            #printer.device_uri = os.path.basename(sys.argv[0])
+            #print printer
             sys.exit(1)
         printer.parse_device_uri(os.getenv('DEVICE_URI'))
         job = Job(sys.argv)
