@@ -44,7 +44,7 @@ newpath}{stroke}ifelse}bind def/showpage{(X)= showpage}bind def\n"
 ## Functions
 ###############################################################################
 
-def ps_to_eps(self, in_file, width, height,
+def ps_to_eps(in_file, width, height,
               flip=False, raster_mode=None, screen=-6, resolution=600):
     """
     Convert a postscript file to an EPS file. This function adds additional
@@ -65,12 +65,13 @@ def ps_to_eps(self, in_file, width, height,
     * resolution - the resolution for printing in dots per inch.
     """
     out = StringIO()
+
     for line in in_file.readlines():
-        out.write(line)
         if line.startswith('%%PageBoundingBox:'):
+            out.write(line)
             match = re.search("%%PageBoundingBox: (\d+) (\d+) (\d+) (\d+)",
                               line)
-            groups = match.groups(1)
+            groups = match.groups()
             lower_left_x = int(groups[0])
             lower_left_y = int(groups[1])
             upper_right_x = int(groups[2])
@@ -83,16 +84,6 @@ def ps_to_eps(self, in_file, width, height,
 
             out.write('/setpagedevice{pop}def\n')
 
-            # Bugfix for document sent rotated from say Inkscape/Cairo
-            if width == doc_height and height == doc_width:
-                # We have a rotated document because the incoming
-                # postscript height is set to what we would expect the
-                # bed_width to be..
-                out.write("-90 rotate")
-                tmp = doc_width
-                doc_width = doc_height
-                doc_height = tmp
-
             # Bugfix for situation where x,y offset is non 0
             if xoffset or yoffset:
                 out.write("%d %d translate\n", -xoffset, -yoffset)
@@ -100,7 +91,7 @@ def ps_to_eps(self, in_file, width, height,
             # Adjust for situation where user wants flip.
             if flip:
                 out.write("%d 0 translate -1 1 scale\n" % doc_width)
-
+            continue
         elif line.startswith('%!'):
             out.write(BOUNDING_BOX_PS)
             if raster_mode == 'mono':
@@ -120,6 +111,7 @@ def ps_to_eps(self, in_file, width, height,
                             "30{180 mul cos exch 180 mul cos add 2 div}"
                             )
                     out.write("setscreen\n")
+        out.write(line)
     out.seek(0)
     return out
 
