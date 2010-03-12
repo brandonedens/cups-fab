@@ -25,16 +25,14 @@ of the generic device RasterVector().
 ## Imports
 ###############################################################################
 
-import os
 import sys
-import traceback
 from cStringIO import StringIO
 
 import ghostscript
 import log
+import pdf
 
 from raster_vector import RasterVector
-from job import Job
 from postscript import ps_to_eps
 from utils import units_to_pts
 
@@ -51,20 +49,30 @@ ESCAPE = "\e"
 ## Classes
 ###############################################################################
 
-class Laser(RasterVector):
+class LaserCutter(RasterVector):
     """
     Generic laser cutter.
     """
 
-    def __init__(self, device_uri):
+    def __init__(self):
         """
         Initialize the laser cutter device.
         """
-        super(Laser, self).__init__(device_uri)
+        super(LaserCutter, self).__init__()
 
         # Setup laser cutter specific cups settings.
         self.device_make_and_model = "Generic Laser Cutter"
         self.device_info = "Laser Cutter (thin red lines vector cut)"
+
+        # Additional offset for the x-axis
+        self.offset_x = 0
+        self.offset_y = 0
+
+    def parse_device_uri(self, device_uri):
+        """
+        Parse device_uri options.
+        """
+        super(LaserCutter, self).parse_device_uri(device_uri)
 
         # Whether or not to auto-focus the laser.
         self.auto_focus = self.get_option(['af', 'auto-focus'], default=True)
@@ -121,10 +129,6 @@ class Laser(RasterVector):
         # Bed height in pts
         self.height = units_to_pts(self.get_option(['h', 'height'],
                                                    default=864))
-
-        # Additional offset for the x-axis
-        self.offset_x = 0
-        self.offset_y = 0
 
     def hpgl_pcl_to_pjl(self, job, hpgl, pcl):
         """
@@ -194,11 +198,48 @@ class Laser(RasterVector):
         """
         Execute the process of sending a job to the laser cutter.
         """
-        super(Laser, self).run(job)
+        super(LaserCutter, self).run(job)
+
+        # First check the job file to determine if it is postscript of pdf.
+        if job.is_pdf():
+            # Gather info on pdf's page size.
+            (width, height) = pdf.page_size(job.file)
+            log.info("Job sent to cups has width = %s and height = %s"
+                     % (width, height))
+            if width == self.height and height == self.width:
+                # We have a rotated job. Rotate pdf to normal layout for laser
+                # cutter's bed.
+                log.info("Rotating pdf file.")
+                job.file = pdf.rotate(job.file)
+
+                if self.debug:
+                    # Debug is enabled so output rotated pdf file.
+                    out_filename = "%s_rotated.pdf" % self.debug_basename(job)
+                    self.debug_write(out_filename, job.file)
+
+            # Convert pdf file to ps file.
+            log.info("Converting pdf file to postscript.")
+            job.file = pdf.to_ps(job.file)
+
+            if self.debug:
+                # Debug enabled so writing the generated ps file.
+                out_filename = "%s.ps" % self.debug_basename(job)
+                self.debug_write(out_filename, job.file)
+
+        elif job.is_ps():
+            pass
+        else:
+            log.crit("Input file is neither pdf nor postscript.")
+            sys.exit(1)
 
         # Convert postscript to eps.
         log.info('Converting input postscript to EPS.')
-        eps = ps_to_eps(job.file)
+        eps = ps_to_eps(job.file, self.width, self.height)
+
+        if self.debug:
+            # Debug enabled so writing the generated eps file.
+            out_file = "%s.eps" % self.debug_basename(job)
+            self.debug_write(out_filename, eps)
 
         # run ghostscript on eps
         log.info('Running ghostscript on eps file.')
@@ -221,26 +262,4 @@ class Laser(RasterVector):
 
         # Successfully completed printing job.
         log.info("Job %s printed." % job)
-
-
-def main():
-    """
-    Main entry for laser cutter program.
-    """
-    try:
-        job = Job(sys.argv)
-        printer = Laser(os.getenv('DEVICE_URI'))
-
-        if len(sys.argv) == 1:
-            # Set the device uri to the script name.
-            printer.device_uri = os.path.basename(sys.argv[0])
-            print printer
-            sys.exit(1)
-
-        printer.run(job)
-        sys.exit(0)
-    except Exception as e:
-        traceback.print_exc()
-        log.crit("Unexpected failure %s." % e)
-        sys.exit(1)
 

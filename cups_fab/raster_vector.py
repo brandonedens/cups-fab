@@ -49,8 +49,8 @@ ESCAPE = "\e"
 
 class RasterVector(Device):
 
-    def __init__(self, device_uri):
-        super(RasterVector, self).__init__(device_uri)
+    def __init__(self):
+        super(RasterVector, self).__init__()
 
         self.flip = False
         self.raster_mode = 'grey'
@@ -65,6 +65,9 @@ class RasterVector(Device):
 
         self.width = 1728
         self.height = 864
+
+    def parse_device_uri(self, device_uri):
+        super(RasterVector, self).parse_device_uri(device_uri)
 
     def vector_to_hpgl(self, vector):
         """

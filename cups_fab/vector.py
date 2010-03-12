@@ -40,8 +40,11 @@ from device import Device
 
 class Vector(Device):
 
-    def __init__(self, device_uri):
-        super(Vector, self).__init__(device_uri)
+    def __init__(self):
+        super(Vector, self).__init__()
+
+    def parse_device_uri(self, device_uri):
+        super(Vector, self).parse_device_uri(device_uri)
 
     def run(self, job):
         super(Vector, self).run(job)

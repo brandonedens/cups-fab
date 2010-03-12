@@ -43,12 +43,19 @@ from config import config
 
 class Device(object):
 
-    def __init__(self, device_uri):
+    def __init__(self):
         self.device_class = "direct"
         self.device_uri = "device"
         self.device_make_and_model = "Unknown"
         self.device_info = "Generic device that does nothing"
 
+        # Set debugging default to whatever configuration specified.
+        self.debug = config.debug
+
+    def parse_device_uri(self, device_uri):
+        """
+        Parse the device_uri options.
+        """
         log.info('Parsing device options.')
         match = re.search('([A-Za-z\-0-9]+)://([A-Za-z\-0-9.]+)/(.*)',
                           device_uri)
@@ -103,10 +110,10 @@ class Device(object):
                 self.options[key] = value
 
     def __str__(self):
-        return "%s %s \"%s\" \"%s\"\n" % (self.device_class,
-                                          self.device_uri,
-                                          self.device_make_and_model,
-                                          self.device_info)
+        return "%s %s \"%s\" \"%s\"" % (self.device_class,
+                                        self.device_uri,
+                                        self.device_make_and_model,
+                                        self.device_info)
 
     def get_option(self, keys, default=None):
         """
@@ -180,21 +187,34 @@ class Device(object):
         # Close the serial port
         ser.close()
 
+    def debug_basename(self, job):
+        """
+        Return the debug file basename for this printer/job.
+        """
+        return "%s_%s_%s" % (os.getenv('PRINTER'),
+                             job.number,
+                             os.getpid())
+
+    def debug_write(self, filename, buffer):
+        """
+        Write the given buffer contents to the given filename.
+        """
+        out_filename = config.tmp_dir + filename
+        out_file = open(out_filename, 'w+b')
+        os.fchmod(out_file.fileno(), 0666)
+        log.debug("Debug enabled so writing file %s." % filename)
+        buffer.seek(0)
+        out_file.write(buffer.read())
+        # Close the output file.
+        out_file.close()
+        # Rewind the buffer for the next person.
+        buffer.seek(0)
+
     def run(self, job):
         log.info("Start printing job %s." % job)
 
-        if config.debug:
+        if self.debug:
             # Debug is enabled so output cups input file information
-            cups_filename = "%s_%s_%s.cups" % (os.getenv('PRINTER'),
-                                               job.number,
-                                               os.getpid())
-            out_filename = config.tmp_dir + cups_filename
-            out_file = open(out_filename, 'w')
-            os.fchmod(out_file.fileno(), 0666)
-            log.debug("Debug enabled so dumping input from cups to file %s."
-                      % out_file.name)
-            job.file.seek(0)
-            out_file.write(job.file.read())
-            out_file.close()
-            job.file.seek(0)
+            out_filename = "%s.cups" % self.debug_basename(job)
+            self.debug_write(out_filename, job.file)
 
