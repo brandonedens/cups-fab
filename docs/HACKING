@@ -142,3 +142,45 @@ properly adjusted back to the right orientation.
 Obviously it'd be great if we could spot pages orientated into landscape mode
 then convert them back to Portrait. This just isn't possible at this time.
 
+
+Another alternative approach to fixing the Inkscape bug
+-------------------------------------------------------
+
+Modifying a postscript file to correct for the inkscape bug requires two
+changes. First you need to set the %%DocumentMedia to the correct width
+height. In our case document media is changed from::
+
+  %%DocumentMedia: plain 1728 864 0 () ()
+
+to::
+
+  %%DocumentMedia: plain 864 1728 0 () ()
+
+Then you have to rotate the entire page by inserting the following postscript
+after the %%PageBoundingBox directive which should be something like::
+
+  /setpagedevice{pop}def
+  -90 rotate -864 0 translate
+
+It is unsure if this fully works at this time as the width/height is also set
+in numerous other locations.
+
+
+
+CUPS Avahi Bugs
+===============
+
+CUPS v1.4+ has known broken compatability with Avahi the free software
+implementation of Zeroconf that is utilized by many distributions. This can be
+read about at https://bugs.launchpad.net/ubuntu/+source/cups/+bug/465916
+specifically
+https://bugs.launchpad.net/ubuntu/+source/cups/+bug/465916/comments/15 .
+
+As it turns out: Apple has been adding functionality to their Zeroconf
+implementation while also modifying Cups to take advantage of this
+functionality specifically the usage of functionality related to
+kDNSServiceFlagsShareConnection.
+
+An inspection of the git repository as of 2010-03-01 reveals that Avahi has yet
+to implement the needed functionality.
+
