@@ -65,14 +65,13 @@ def main():
     Main entry of vinyl cutter program.
     """
     try:
-        job = Job(sys.argv)
         printer = VinylCutter(os.getenv('DEVICE_URI'))
-
         if len(sys.argv) == 1:
             # Set the device uri to the script name.
             printer.device_uri = os.path.basename(sys.argv[0])
             print printer
             sys.exit(1)
+        job = Job(sys.argv)
         printer.run(job)
         sys.exit(0)
     except Exception as e:
