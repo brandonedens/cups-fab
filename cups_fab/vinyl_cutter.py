@@ -34,11 +34,6 @@ from vector import Vector
 
 
 ###############################################################################
-## Constants
-###############################################################################
-
-
-###############################################################################
 ## Classes
 ###############################################################################
 
@@ -47,35 +42,18 @@ class VinylCutter(Vector):
     Generic vinyl cutter.
     """
 
-    def __init__(self, device_uri):
+    def __init__(self):
         """
         Initialize the vinyl cutter device.
         """
-        super(VinylCutter, self).__init__(device_uri)
+        super(VinylCutter, self).__init__()
         self.device_make_and_model = "Generic Vinyl Cutter"
         self.device_info = "Vinyl Cutter (thin red lines vector cut)"
 
+    def parse_device_uri(self, device_uri):
+        """
+        Parse device_uri options.
+        """
+        super(VinylCutter, self).parse_device_uri(device_uri)
 
-###############################################################################
-## Functions
-###############################################################################
-
-def main():
-    """
-    Main entry of vinyl cutter program.
-    """
-    try:
-        printer = VinylCutter(os.getenv('DEVICE_URI'))
-        if len(sys.argv) == 1:
-            # Set the device uri to the script name.
-            printer.device_uri = os.path.basename(sys.argv[0])
-            print printer
-            sys.exit(1)
-        job = Job(sys.argv)
-        printer.run(job)
-        sys.exit(0)
-    except Exception as e:
-        traceback.print_exc()
-        log.crit("Unexpected failure %s." % e)
-        sys.exit(1)
 
