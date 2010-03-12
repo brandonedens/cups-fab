@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+# Brandon Edens
+# AS220
+# 2009-12-18
+# Copyright (C) 2009 Brandon Edens <brandon@as220.org>
+#
+# This file is part of cups_fab.
+#
+# cups_fab is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cups_fab is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cups_fab. If not, see <http://www.gnu.org/licenses/>.
+"""
+Main entry point for laser cutter printing.
+
+WARNING WARNING:
+
+This executable must have permissions set to 0700 in order to force cups to
+execute it as root which allows us to open the job information in
+/var/spool/cups/.
+"""
+
+###############################################################################
+## Imports
+###############################################################################
+import os
+import sys
+import traceback
+
+# Local imports
+from cups_fab.laser_cutter import LaserCutter
+from cups_fab.job import Job
+from cups_fab import log
+
+
+###############################################################################
+## Main
+###############################################################################
+
+if __name__ == '__main__':
+    """
+    Main entry for laser cutter program.
+    """
+    try:
+        printer = LaserCutter()
+        if len(sys.argv) == 1:
+            # Set the device uri to the script name.
+            printer.device_uri = os.path.basename(sys.argv[0])
+            print printer
+            sys.exit(1)
+        printer.parse_device_uri(os.getenv('DEVICE_URI'))
+        job = Job(sys.argv)
+        printer.run(job)
+        sys.exit(0)
+    except Exception as e:
+        traceback.print_exc()
+        log.crit("Unexpected failure %s." % e)
+        sys.exit(1)
+
