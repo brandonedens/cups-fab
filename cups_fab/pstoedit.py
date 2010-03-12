@@ -25,10 +25,11 @@ postscript/pdf to a vector format.
 ## Imports
 ###############################################################################
 
-from cStringIO import StringIO
-import log
 import subprocess
+import sys
+from cStringIO import StringIO
 
+import log
 from config import config
 
 
@@ -76,7 +77,7 @@ def execute(in_file,
         log.debug("Standard error for pstoedit was:")
         for line in out.readlines():
             log.debug(line)
-        return ""
+        sys.exit(1)
     else:
         # Collect the outputted text.
         text = stdoutdata
