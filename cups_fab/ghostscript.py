@@ -25,6 +25,7 @@ File that defines handling of external program ghostscript.
 ###############################################################################
 
 import subprocess
+import sys
 import tempfile
 from cStringIO import StringIO
 
@@ -99,4 +100,9 @@ def raster_mode_to_ghostscript(mode):
         return 'pnggray'
     elif mode in ['color', 'colour']:
         return 'png16m'
+    elif mode == 'none':
+        return None
+    else:
+        log.crit("Invalid raster mode %s specified." % mode)
+        sys.exit(1)
 
