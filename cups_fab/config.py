@@ -52,6 +52,15 @@ class Config(object):
         self.xscale = 1.416666
         self.yscale = 1.416666
 
+        # pdftk related settings
+        self.pdftk = '/usr/bin/pdftk'
+
+        # pdfinfo related settings
+        self.pdfinfo = '/usr/bin/pdfinfo'
+
+        # pdf2ps related settings
+        self.pdf2ps = '/usr/bin/pdf2ps'
+
         # pstoedit related settings
         self.pstoedit = '/usr/bin/pstoedit'
         self.pstoedit_format = 'hpgl:-pen'
