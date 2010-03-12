@@ -26,6 +26,7 @@ DEVICE_URI environment variable that cups provides.
 ###############################################################################
 
 import sys
+from cStringIO import StringIO
 
 import log
 
@@ -57,12 +58,36 @@ class Job(object):
         except IndexError:
             log.debug('Input file not specified.')
             log.debug('Loading cups data from stdin.')
-            self.file = sys.stdin
+            self.file = StringIO()
+            self.file.write(sys.stdin.read())
 
     def __str__(self):
         return "number %s named %s for user %s" % (self.number,
                                                    self.title,
                                                    self.user)
+
+    def is_ps(self):
+        """
+        Return True if the beginning magick of the input file is %!PS, False
+        otherwise.
+        """
+        label = self.file.read(4)
+        self.file.seek(0)
+        if label == '%!PS':
+            return True
+        return False
+
+    def is_pdf(self):
+        """
+        Return True if the beginning magick of the input file is %PDF, False
+        otherwise.
+        """
+        label = self.file.read(4)
+        self.file.seek(0)
+        if label == '%PDF':
+            return True
+        return False
+
 
 
 ###############################################################################
