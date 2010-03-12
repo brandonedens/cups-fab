@@ -37,32 +37,28 @@ import sys
 import traceback
 
 # Local imports
-from cups_fab.device import Vector
+from cups_fab.vinyl_cutter import VinylCutter
 from cups_fab.job import Job
 from cups_fab import log
 
-
 ###############################################################################
-## Functions
+## Main
 ###############################################################################
-
-def main():
-    """
-    Main method of program.
-    """
-    if len(sys.argv) == 1:
-        program_name = os.path.basename(sys.argv[0])
-        print "direct %s \"Unknown\" \"Vinyl Cutter (thin red lines vector cut)\"\n" % program_name
-        sys.exit(1)
-
-    job = Job(sys.argv)
-    printer = Vector(os.getenv('DEVICE_URI'))
-    printer.run(job)
-
 
 if __name__ == '__main__':
+    """
+    Main entry for laser cutter program.
+    """
     try:
-        main()
+        printer = VinylCutter()
+        if len(sys.argv) == 1:
+            # Set the device uri to the script name.
+            printer.device_uri = os.path.basename(sys.argv[0])
+            print printer
+            sys.exit(1)
+        printer.parse_device_uri(os.getenv('DEVICE_URI'))
+        job = Job(sys.argv)
+        printer.run(job)
         sys.exit(0)
     except Exception as e:
         traceback.print_exc()
