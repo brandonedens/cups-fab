@@ -47,6 +47,8 @@ class VinylCutter(Vector):
         Initialize the vinyl cutter device.
         """
         super(VinylCutter, self).__init__()
+
+        # Setup vinyl cutter specific cups settings.
         self.device_make_and_model = "Generic Vinyl Cutter"
         self.device_info = "Vinyl Cutter (thin red lines vector cut)"
 
