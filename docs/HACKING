@@ -97,7 +97,7 @@ Cups Security
 =============
 
 As it turns out, cups creates temporary files in /var/spool/cups with creation
-mask of 0600 and a user:group of root:lp under Ubuntu. This means that if our
+mask of 0700 and a user:group of root:lp under Ubuntu. This means that if our
 backend process is running as any user other than root then we will not be able
 to open the file that contains the job to print.
 
