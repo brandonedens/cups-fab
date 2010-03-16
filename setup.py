@@ -1,15 +1,15 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.1'
+version = '0.5'
 
 setup(name='cups_fab',
       version=version,
-      description="Python cups backend for HPGL printing.",
+      description="Python cups backend(s) for printing to fabrication machines.",
       long_description="""\
-Python cups backend for printing to HPGL devices.""",
+Python cups backend(s) for printing to fabrication machines.""",
       classifiers=[],
-      keywords='hpgl cups',
+      keywords='hpgl pcl cups fab fabrication',
       author='Brandon Edens',
       author_email='brandon@as220.org',
       url='http://as220.org/git/gitweb/',
