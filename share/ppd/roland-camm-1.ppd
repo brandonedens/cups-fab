@@ -1,0 +1,82 @@
+*PPD-Adobe: "4.3"
+*%%%% PPD file for Camm-1 CX-24 with CUPS.
+*%%%% Created by the CUPS PPD Compiler CUPS v1.4.1.
+*FormatVersion: "4.3"
+*FileVersion: "1.0"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName: "roland-camm-1.ppd"
+*Product: "(Roland Camm-1 CX-24)"
+*Manufacturer: "Roland"
+*ModelName: "Roland Camm-1 CX-24"
+*ShortNickName: "Roland Camm-1 CX-24"
+*NickName: "Roland Camm-1 CX-24, 1.0"
+*PSVersion: "(3010) 0"
+*LanguageLevel: "3"
+*ColorDevice: False
+*DefaultColorSpace: RGB
+*FileSystem: False
+*Throughput: "1"
+*LandscapeOrientation: Any
+*TTRasterizer: Type42
+*% Driver-defined attributes...
+*cupsLanguages: "en"
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Roland_Max_Size_Bed
+*PageSize Roland_Max_Size_Bed/Roland_Max_Size_Bed: "<</PageSize[1980 51840]/ImagingBBox null>>setpagedevice"
+*PageSize Vinyl_12in_Roll/Vinyl_12in_Roll: "<</PageSize[864 51840]/ImagingBBox null>>setpagedevice"
+*PageSize Vinyl_24in_Roll/Vinyl_24in_Roll: "<</PageSize[1728 51840]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+*OpenUI *PageRegion/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Roland_Max_Size_Bed
+*PageRegion Roland_Max_Size_Bed/Roland_Max_Size_Bed: "<</PageSize[1980 51840]/ImagingBBox null>>setpagedevice"
+*PageRegion Vinyl_12in_Roll/Vinyl_12in_Roll: "<</PageSize[864 51840]/ImagingBBox null>>setpagedevice"
+*PageRegion Vinyl_24in_Roll/Vinyl_24in_Roll: "<</PageSize[1728 51840]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+*DefaultImageableArea: Roland_Max_Size_Bed
+*ImageableArea Roland_Max_Size_Bed/Roland_Max_Size_Bed: "0 0 1980 51840"
+*ImageableArea Vinyl_12in_Roll/Vinyl_12in_Roll: "0 0 864 51840"
+*ImageableArea Vinyl_24in_Roll/Vinyl_24in_Roll: "0 0 1728 51840"
+*DefaultPaperDimension: Roland_Max_Size_Bed
+*PaperDimension Roland_Max_Size_Bed/Roland_Max_Size_Bed: "1980 51840"
+*PaperDimension Vinyl_12in_Roll/Vinyl_12in_Roll: "864 51840"
+*PaperDimension Vinyl_24in_Roll/Vinyl_24in_Roll: "1728 51840"
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(1.05)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(1.05)" Standard ROM
+*Font AvantGarde-Demi: Standard "(1.05)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(1.05)" Standard ROM
+*Font Bookman-Demi: Standard "(1.05)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(1.05)" Standard ROM
+*Font Bookman-Light: Standard "(1.05)" Standard ROM
+*Font Bookman-LightItalic: Standard "(1.05)" Standard ROM
+*Font Courier: Standard "(1.05)" Standard ROM
+*Font Courier-Bold: Standard "(1.05)" Standard ROM
+*Font Courier-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Courier-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica: Standard "(1.05)" Standard ROM
+*Font Helvetica-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Oblique: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(1.05)" Standard ROM
+*Font Palatino-Bold: Standard "(1.05)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Palatino-Italic: Standard "(1.05)" Standard ROM
+*Font Palatino-Roman: Standard "(1.05)" Standard ROM
+*Font Symbol: Special "(001.005)" Special ROM
+*Font Times-Bold: Standard "(1.05)" Standard ROM
+*Font Times-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Times-Italic: Standard "(1.05)" Standard ROM
+*Font Times-Roman: Standard "(1.05)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
+*Font ZapfDingbats: Special "(001.005)" Special ROM
+*% End of roland-camm-1.ppd, 04040 bytes.
