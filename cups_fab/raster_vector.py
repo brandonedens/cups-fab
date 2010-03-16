@@ -202,7 +202,7 @@ class RasterVector(Device):
                 pcl.write(ESCAPE + "*p%dY" % ypos[pixel])
                 pcl.write(ESCAPE + "*p%dX" % xpos[pixel])
                 # Write data to device as
-                pcl.write(ESCAPE + "*v6W"
+                pcl.write(ESCAPE + "*v6W")
             print xpos
             print ypos
             #pcl.write(ESCAPE + "*p%dY" % 0)
