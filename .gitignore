@@ -1,3 +1,8 @@
 *.pyc
 build/
 dist/
+c_src/laser-cutter
+build-stamp
+configure-stamp
+debian/cups-fab.*
+debian/cups-fab/
