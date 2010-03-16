@@ -30,6 +30,7 @@ from cStringIO import StringIO
 
 import numpy
 from PIL import Image
+from PIL import ImageFileIO
 
 from device import Device
 
@@ -67,6 +68,10 @@ class RasterVector(Device):
         self.height = 864
 
     def parse_device_uri(self, device_uri):
+        """
+        Parse a raster vector device's device_uri which in this case merely
+        passes off control to the generic Device.
+        """
         super(RasterVector, self).parse_device_uri(device_uri)
 
     def vector_to_hpgl(self, vector):
@@ -110,11 +115,16 @@ class RasterVector(Device):
         """
         Given raster data (a png file) produced by ghostscript. Convert that
         image to PCL data.
+
+        We convert an image to raster data using PCL:
+        pcl imaging direct by pixel mode where each pixel is 24 bits.
         """
         pcl = StringIO()
 
         # Open the image.
-        image = Image.open(raster)
+        file_io = ImageFileIO.ImageFileIO(raster)
+        #image = Image.frombuffer('RGBA', size, raster, 'png')
+        image = Image.open(file_io)
 
         # Gather width and height information for image.
         width, height = image.size
@@ -125,8 +135,46 @@ class RasterVector(Device):
 
         # Convert PIL image to numpy array.
         pixels = numpy.asarray(image)
+
+
+        # The first step is to restructure raster data so that the pixel values
+        # reflect some notion of our raster power.
+        if self.raster_mode in ['color', 'colour']:
+            # This is normalization for color.
+
+
+            # Finally normalize pixel values to the set raster power. So if
+            # raster_power had a value of 40 and our pixel had value of 128
+            # then that pixel would now have value of 20 or half raster power.
+            pixels = pixels * self.raster_power / 255
+
+        elif self.raster_mode in ['grey', 'gray']:
+            # This is normalization for greyscale.
+
+            # Invert values of the pixels so complete white becomes value 0 and
+            # complete black becomes value 255.
+            pixels = (255 - pixels)
+
+            # Finally normalize pixel values to the set raster power. So if
+            # raster_power had a value of 40 and our pixel had value of 128
+            # then that pixel would now have value of 20 or half raster power.
+            pixels = pixels * self.raster_power / 255
+
+        elif self.raster_mode in ['mono']:
+            # This is normalization for mono.
+            pass
+
+
+        # Now we begin process of transmitting our finalized raster data to the
+        # printer. First we're going to find the places where our image
+        # contains information to be printed.
+        bw_pixels = numpy.asarray(image.convert('L'))
         # Find position(s) of non-white portions on the raster.
-        xpos, ypos = numpy.where( pixels < 255 )
+        xpos, ypos = numpy.where( bw_pixels > 0)
+
+
+        for i in xpos:
+            print "pixel at %d x %d is %s" % (xpos[i], xpos[i], pixels[xpos[i], ypos[i]])
 
         # Print the PCL header
         pcl.write(ESCAPE + "*rOF")
@@ -150,8 +198,15 @@ class RasterVector(Device):
         pcl.write(ESCAPE + "*r1A")
 
         for repeat in range(0, self.raster_repeat):
-            pcl.write(ESCAPE + "*p%dY" % 0)
-            pcl.write(ESCAPE + "*p%dX" % 0)
+            for pixel in ypos:
+                pcl.write(ESCAPE + "*p%dY" % ypos[pixel])
+                pcl.write(ESCAPE + "*p%dX" % xpos[pixel])
+                # Write data to device as
+                pcl.write(ESCAPE + "*v6W"
+            print xpos
+            print ypos
+            #pcl.write(ESCAPE + "*p%dY" % 0)
+            #pcl.write(ESCAPE + "*p%dX" % 0)
 
         pcl.seek(0)
         return pcl
