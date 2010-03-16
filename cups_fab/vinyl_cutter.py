@@ -24,12 +24,6 @@ Software specific to printing to a vinyl cutter.
 ## Imports
 ###############################################################################
 
-import os
-import sys
-import traceback
-
-import log
-from job import Job
 from vector import Vector
 
 
