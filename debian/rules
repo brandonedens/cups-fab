@@ -7,19 +7,26 @@ PACKAGE_NAME=cups-fab
 PACKAGE_DIR=$(CURDIR)/debian/$(PACKAGE_NAME)
 SITE_PACKAGES_DIR=$(PACKAGE_DIR)$(call py_libdir,$(shell pyversions -d))
 
-build: build-stamp
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	touch configure-stamp
 
+build: build-stamp
 build-stamp:
 	dh_testdir
+	gcc -o ./c_src/laser-cutter `cups-config --cflags` ./c_src/cups-epilog.c `cups-config --libs`
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
 	find . -name '*.py[co]' -delete
+	rm -rf build-stamp configure-stamp
 	rm -rf _build build
+	rm -rf c_src/laser-cutter
 
-install:
+install: build
 	dh_testdir
 	dh_testroot
 	dh_installdirs
@@ -30,11 +37,12 @@ install:
 	install -m 644 $(CURDIR)/share/ppd/roland-camm-1.ppd $(PACKAGE_DIR)/usr/share/ppd/cups-fab/
 
 	# Install executable scripts
-	install -m 700 $(CURDIR)/bin/laser-cutter $(PACKAGE_DIR)/usr/lib/cups/backend/laser-cutter
+	install -m 755 $(CURDIR)/c_src/laser-cutter $(PACKAGE_DIR)/usr/lib/cups/backend/laser-cutter
+	# Temporary disable installation of new version of the laser-cutter software.
+	#install -m 700 $(CURDIR)/bin/laser-cutter $(PACKAGE_DIR)/usr/lib/cups/backend/laser-cutter
 	install -m 700 $(CURDIR)/bin/vinyl-cutter $(PACKAGE_DIR)/usr/lib/cups/backend/vinyl-cutter
 
-
-binary-indep: build install
+binary-indep: install
 	dh_testdir
 	dh_testroot
 	dh_installdocs
@@ -45,8 +53,8 @@ binary-indep: build install
 	dh_md5sums
 	dh_builddeb
 
-binary-arch: build install
+binary-arch: install
 
 binary: binary-indep binary-arch
 
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: build clean binary-indep binary-arch binary install configure
