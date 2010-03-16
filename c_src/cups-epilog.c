@@ -94,13 +94,13 @@
  *
  *
  * Installation:
- * gcc -o epilog `cups-config --cflags` cups-epilog.c `cups-config --libs`
+ * gcc -o laser-cutter `cups-config --cflags` cups-epilog.c `cups-config --libs`
  * http://www.cups.org/documentation.php/api-overview.html
  *
  * Manual testing can be accomplished through execution akin to:
- * $ export DEVICE_URI="epilog://epilog-mini/Legend/rp=100/rs=100/vp=100/vs=10/vf=5000/rm=grey"
- * # ./epilog job user title copies options
- * $ ./epilog 123 jdoe test 1 options ~/test.pdf
+ * $ export DEVICE_URI="laser-cutter://epilog-mini/Legend/rp=100/rs=100/vp=100/vs=10/vf=5000/rm=grey"
+ * # ./laser-cutter job user title copies options
+ * $ ./laser-cutter 123 jdoe test 1 options ~/test.pdf
  *
  */
 
@@ -1463,7 +1463,7 @@ main(int argc, char *argv[])
      * @endverbatim
      */
     if (argc == 1) {
-        printf("direct epilog \"Unknown\" \"Epilog laser (thin red lines vector cut)\"\n");
+        printf("direct laser-cutter \"Generic Laser Cutter\" \"Laser Cutter (thin red lines vector cut)\"\n");
         return 1;
     }
     if (argc > 1) {
