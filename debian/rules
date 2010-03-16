@@ -1,0 +1,52 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+include /usr/share/python/python.mk
+
+PACKAGE_NAME=cups-fab
+PACKAGE_DIR=$(CURDIR)/debian/$(PACKAGE_NAME)
+SITE_PACKAGES_DIR=$(PACKAGE_DIR)$(call py_libdir,$(shell pyversions -d))
+
+build: build-stamp
+
+build-stamp:
+	dh_testdir
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	find . -name '*.py[co]' -delete
+	rm -rf _build build
+
+install:
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+
+	python setup.py install --no-compile --install-layout=deb --root $(PACKAGE_DIR)
+
+	# Install custom ppd
+	install -m 644 $(CURDIR)/share/ppd/roland-camm-1.ppd $(PACKAGE_DIR)/usr/share/ppd/cups-fab/
+
+	# Install executable scripts
+	install -m 700 $(CURDIR)/bin/laser-cutter $(PACKAGE_DIR)/usr/lib/cups/backend/laser-cutter
+	install -m 700 $(CURDIR)/bin/vinyl-cutter $(PACKAGE_DIR)/usr/lib/cups/backend/vinyl-cutter
+
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_pysupport
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-arch: build install
+
+binary: binary-indep binary-arch
+
+.PHONY: build clean binary-indep binary-arch binary install

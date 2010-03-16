@@ -1,0 +1,15 @@
+Source: cups-fab
+Section: unknown
+Priority: extra
+Maintainer: Brandon Edens <brandon@as220.org>
+Build-Depends: debhelper (>= 7), python-all (>= 2.5.4-1~), python-setuptools (>= 0.6c5-1~)
+Standards-Version: 3.8.1
+Homepage: http://as220.org/git/gitweb/?p=cups_fab.git;a=summary
+
+Package: cups-fab
+Architecture: any
+Depends: ${python:Depends}, cups, python-imaging, python-serial, pstoedit, pdftk, poppler-utils, ghostscript
+Description: CUPS fabrication machine software.
+ Software for controlling machines related to personal fabrication such as
+ vinyl cutters, milling machines, and laser cutters.
+
