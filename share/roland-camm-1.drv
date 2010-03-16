@@ -36,19 +36,19 @@ MediaSize "Vinyl_12in_Roll"
 MediaSize "Vinyl_24in_Roll"
 
 // Query command for page size
-Attribute "?PageSize" "" "
-      save
-      currentpagedevice /PageSize get aload pop
-      2 copy gt {exch} if (Unknown)
-      23 dict
-              dup [1980 51840] "(Roland - Max Size Bed)" put
-              dup [864 51840] "(Vinyl - 12in Roll)" put
-              dup [1728 51840] "(Vinyl - 24in Roll)" put
-              {exch aload pop 4 index sub abs 5 le exch
-               5 index sub abs 5 le and
-              {exch pop exit} {pop} ifelse
-      } bind forall = flush pop pop
-      restore"
+// Attribute "?PageSize" "" "
+//       save
+//       currentpagedevice /PageSize get aload pop
+//       2 copy gt {exch} if (Unknown)
+//       23 dict
+//               dup [1980 51840] "(Roland - Max Size Bed)" put
+//               dup [864 51840] "(Vinyl - 12in Roll)" put
+//               dup [1728 51840] "(Vinyl - 24in Roll)" put
+//               {exch aload pop 4 index sub abs 5 le exch
+//                5 index sub abs 5 le and
+//               {exch pop exit} {pop} ifelse
+//       } bind forall = flush pop pop
+//       restore"
 
 // Specify the name of the PPD file we want to generate
 PCFileName "roland-camm-1.ppd"
