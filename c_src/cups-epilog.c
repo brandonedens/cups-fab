@@ -98,7 +98,7 @@
  * http://www.cups.org/documentation.php/api-overview.html
  *
  * Manual testing can be accomplished through execution akin to:
- * $ export DEVICE_URI="laser-cutter://epilog-mini/Legend/rp=100/rs=100/vp=100/vs=10/vf=5000/rm=grey"
+ * $ export DEVICE_URI="laser-cutter://epilog-mini/rp=100/rs=100/vp=100/vs=10/vf=5000/rm=grey"
  * # ./laser-cutter job user title copies options
  * $ ./laser-cutter 123 jdoe test 1 options ~/test.pdf
  *
