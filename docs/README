@@ -13,8 +13,429 @@ CUPS Fabrication Machine Printing
 Introduction
 ============
 
+Setting up Printers via CUPS Web Interface
+==========================================
 
-Usage
-=====
+First open a web browser and surf to the page: http://localhost:631/ which is
+the configuration page for CUPS. The image below shows the default page you
+should be greeted with.
 
+.. image:: images/cups_default_page.png
+   :alt: CUPS default webpage.
+   :width: 400
+
+
+To setup a print queue you have to access the CUPS administrative page by
+clicking on the text that reads "Administrator". Upon clicking that you should
+be greeted with the following page.
+
+.. image:: images/cups_admin.png
+   :alt: CUPS administrative webpage.
+   :width: 400
+
+To access the administrative facilities you're going to have to provide a
+username and password as shown in the following image.
+
+.. image:: images/cups_password_check.png
+   :alt: CUPS password check.
+   :width: 200
+
+The username to log in is "root". root is the super user for your *nix based
+machine be it Mac OSX, Ubuntu GNU/Linux, etc... The password for the root user
+might not be known to you. Oftentimes in modern Operating System installs the
+root user's password is scrambled to protect the machine from possibly security
+compromise.
+
+However, try to login as root using the same password as what you use to login
+to your own account. If that fails to work then you'll need to reset the root
+password. Details for doing that are contained in the section `Setting root's
+password`.
+
+We proceed with adding a printer to cups as shown in the next screenshot.
+
+.. image:: images/cups_add_printer.png
+   :width: 400
+
+
+
+Setting up a Laser Cutter Queue
+-------------------------------
+
+To add a laser cutter click the radio button that reads "Laser Cutter (thin red
+lines vector cut)" as shown in the next screenshot.
+
+.. image:: images/cups_add_printer_laser_cutter.png
+   :width: 400
+
+
+Now you will be prompted for the connection type. This portion of the setup is
+critical as the text you type here controls how the laser cutter behaves when
+jobs are printed to this queue. A basic laser cutter setup string is shown
+below.
+
+.. image:: images/cups_add_printer_connection.png
+   :width: 400
+
+What you see in the above screenshot is the following string::
+
+  laser-cutter://epilog_mini/rp=100/rs=100/vp=100/vs=10/vf=5000/rm=grey/af=1
+
+In our lab the laser cutter's address on the network is bound to the hostname
+epilog_mini which coincides with IP address 192.168.254.4. Therefore specifying
+192.168.254.4 rather than epilog_mini would have worked equally well making our
+settings string::
+
+  laser-cutter://192.168.254.4/rp=100/rs=100/vp=100/vs=10/vf=5000/rm=grey/af=1
+
+Now let's discuss the rest of the string which includes settings for the
+cutter. You'll note that all instructions are in a key/value form like::
+
+  some_letters=some_value
+
+where some_letters are something like "rp" or "rs" and some value is a number
+like 100 or some text. Each of these keys represent a setting for the cutter
+and the value is some number that is dependent upon that setting.
+
+Chart of Laser Cutter Setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is a chart showing the available laser cutter settings.
+
++------------------+------------------+------------------+------------------+
+|laser cutter      |description       |key code          |range of setting  |
+|setting           |                  |                  |                  |
++==================+==================+==================+==================+
+|raster power      |The power of the  |rp                |0 - 100           |
+|                  |laser during      |                  |                  |
+|                  |raster pass. Power|                  |                  |
+|                  |of 0 disables     |                  |                  |
+|                  |raster pass.      |                  |                  |
++------------------+------------------+------------------+------------------+
+|raster speed      |The speed of the  |rs                |0 - 100           |
+|                  |laser during      |                  |                  |
+|                  |raster pass.      |                  |                  |
++------------------+------------------+------------------+------------------+
+|vector power      |The power of the  |vp                |0 - 100           |
+|                  |laser during the  |                  |                  |
+|                  |vector cutting    |                  |                  |
+|                  |pass. Power of 0  |                  |                  |
+|                  |disables vector   |                  |                  |
+|                  |pass.             |                  |                  |
++------------------+------------------+------------------+------------------+
+|vector speed      |The speed of the  |vs                |0 - 100           |
+|                  |laser during the  |                  |                  |
+|                  |vector cutting    |                  |                  |
+|                  |pass.             |                  |                  |
++------------------+------------------+------------------+------------------+
+|vector frequency  |The frequency by  |vf                |0 - 5000          |
+|                  |which the laser   |                  |                  |
+|                  |turns on and off  |                  |                  |
+|                  |per a second (Hz) |                  |                  |
+|                  |during vector     |                  |                  |
+|                  |cutting pass. Low |                  |                  |
+|                  |values can be used|                  |                  |
+|                  |to create         |                  |                  |
+|                  |perforated lines. |                  |                  |
+|                  |                  |                  |                  |
+|                  |                  |                  |                  |
++------------------+------------------+------------------+------------------+
+|bed width (in pts)|The width of the  |w                 |1728              |
+|                  |laser cutter bed  |                  |                  |
+|                  |in pts (72 pts per|                  |                  |
+|                  |inch).            |                  |                  |
++------------------+------------------+------------------+------------------+
+|bed height (in    |The height of the |h                 |864               |
+|pts)              |laser cutter bed  |                  |                  |
+|                  |in pts (72 pts per|                  |                  |
+|                  |inch).            |                  |                  |
++------------------+------------------+------------------+------------------+
+|screen            |Screen setting    |sc                |-10, 6, 5         |
+|                  |which affects mono|                  |                  |
+|                  |raster mode. This |                  |                  |
+|                  |is half-toning    |                  |                  |
+|                  |settings in       |                  |                  |
+|                  |postscript.       |                  |                  |
++------------------+------------------+------------------+------------------+
+|resolution (dpi)  |Resolution of the |r                 |75, 300, 600, 1200|
+|                  |raster.           |                  |                  |
++------------------+------------------+------------------+------------------+
+|auto focus        |Whether to        |af                |0, 1 (for false / |
+|                  |enable/disable    |                  |true respectively)|
+|                  |auto focus.       |                  |                  |
++------------------+------------------+------------------+------------------+
+|flip              |Whether to flip   |f                 |0, 1 (for false / |
+|                  |the raster image  |                  |true respectively)|
+|                  |along the x axis. |                  |                  |
++------------------+------------------+------------------+------------------+
+|raster mode       |The raster mode   |rm                |mono, grey, color |
+|                  |which is one of   |                  |                  |
+|                  |mono, grey, or    |                  |                  |
+|                  |color. Mono is    |                  |                  |
+|                  |either on or off  |                  |                  |
+|                  |of laser. Grey is |                  |                  |
+|                  |power of laser    |                  |                  |
+|                  |fluctuates along  |                  |                  |
+|                  |greyscale of      |                  |                  |
+|                  |image. Color is   |                  |                  |
+|                  |laser power       |                  |                  |
+|                  |dependent upon    |                  |                  |
+|                  |what color in     |                  |                  |
+|                  |image.            |                  |                  |
++------------------+------------------+------------------+------------------+
+
+
+So setting up a queue for matteboard might involve a string such as::
+
+  laser-cutter://192.168.254.4/r=300/rp=45/rs=100/vp=50/vs=30/vf=10/rm=grey/af=1
+
+which would set resolution to 300 dpi, raster power 45, raster speed 100,
+vector power 50, vector speed 30, vector frequency 10, raster mode = grey, and
+auto focus is enabled. The most interesting setting here is vector frequency
+set to 10 which means that the laser is going to cut on and off 10 times per a
+second.
+
+
+Following setting the queue's options we name the printer, add a description,
+and specify the location of the printer. The name of the printer and
+description is critical towards making sure that users know what type of queue
+they are printing to. For the queue we're setting up we specified that this
+queue is intended to be used for 2 inch wood. When users search the network for
+other print queues the name and description play a critical role towards
+directing print jobs to a queue that matches the correct material in the laser
+cutter.
+
+.. image:: images/cups_add_printer_name_description_location.png
+   :width: 400
+
+When specifying the make of the laser cutter, choose "Raw". Raw will allow the
+software sending the print job to decide for itself how to send the job. In the
+case of Inkscape the job will be sent to the laser cutter in .pdf form.
+
+.. image:: images/cups_add_printer_make.png
+   :width: 400
+
+Because the Make was chosen as "Raw" we choose the "Raw Queue" for the printer
+model type.
+
+.. image:: images/cups_add_printer_model.png
+   :width: 400
+
+Do not change any of the default options.
+
+.. image:: images/cups_add_printer_default_options.png
+   :width: 400
+
+Now you should be presented with a setup completed screen. You now have a print
+queue for cutting 2 inch wood.
+
+.. image:: images/cups_add_printer_setup_completed.png
+   :width: 400
+
+Now you can verify that the settings you created by checking your available
+print queues in the gnome print manager.
+
+.. image:: images/ubuntu_printer_configuration_post_cups.png
+   :width: 200
+
+Viewing the properties of the queue shows similar information to what was set
+via CUPS.
+
+.. image:: images/ubuntu_printer_configuration_post_cups2.png
+   :width: 200
+
+Congratulations, you have now setup a print queue for printing to 2 inch wood
+for your laser cutter.
+
+
+Setting up a Vinyl Cutter Queue
+-------------------------------
+
+To add a vinyl cutter click the radio button that reads "Vinyl Cutter (thin red
+lines vector cut)" as shown in the next screenshot.
+
+.. image:: images/cups_add_printer_vinyl_cutter.png
+   :width: 400
+
+
+If your vinyl cutter is attached via a USB/serial device specify the connection
+to the vinyl cutter similar to the image shown in the following screenshot.
+
+.. image:: images/cups_add_printer_vinyl_cutter_usb_attached.png
+   :width: 400
+
+which is::
+
+  vinyl-cutter://ttyUSB0/
+
+If your vinyl cutter is attached via a serial to network converted like ours is
+then specify the settings for the vinyl cutter similar to the following screenshot.
+
+.. image:: images/cups_add_printer_vinyl_cutter_network_attached.png
+   :width: 400
+
+which is::
+
+  vinyl-cutter://192.168.254.6:9100/
+
+for the device with IP address 192.168.254.6 listening on port 6001.
+
+Now you need to specify the name and description. Here again its important to
+choose a reasonable name for the vinyl cutter especially if you will be sharing
+this print queue with others.
+
+.. image:: images/cups_add_printer_vinyl_cutter_name_and_description.png
+   :width: 400
+
+Now we setup the make for the vinyl cutter. In our lab we own the Epilog Camm-1
+vinyl cutter. The cups fab software installs a postscript printer definition
+(ppd) which defines our vinyl cutter and forces software sending jobs to it to
+send them as postscript jobs. In the screenshot below you'll note that Roland
+was chosen as the make for the printer.
+
+.. image:: images/cups_add_printer_vinyl_cutter_make.png
+   :width: 400
+
+Now choose the cooresponding model Camm-1.
+
+.. image:: images/cups_add_printer_vinyl_cutter_model.png
+   :width: 400
+
+Now set the default layout for pages sent to the vinyl cutter. Please note that
+this is nothing more than an aesthetic setting at the moment but might contain
+meaning later.
+
+.. image:: images/cups_add_printer_vinyl_cutter_general_options.png
+   :width: 400
+
+Finally you are presented with the printer settings page.
+
+.. image:: images/cups_add_printer_vinyl_cutter_completed.png
+   :width: 400
+
+Congratulations you have properly setup a vinyl cutter that is printable via
+standard software such as Inkscape.
+
+
+Setting root's password
+=======================
+
+Probably the easiest way to reset root's password is to just use a terminal to
+switch to the root user then execute the passwd command to reset root's
+password.
+
+First you'll have to open a terminal. In Ubuntu this is done through Clicking
+the following items:
+Applications -> Accessories -> Terminal
+Under Mac OSX you open your Finder, choose Applications, then Utilities, then
+Terminal.
+
+A screenshot of a typical terminal is shown below.
+
+.. image:: images/terminal_default.png
+   :alt: A typical terminal.
+   :width: 300
+
+
+Now we use the sudo command to switch user to root. To do this type something
+like::
+
+  sudo su -
+
+which will use sudo to execute the command su - which will switch user to
+root. A screenshot of the output is shown below.
+
+.. image:: images/terminal_sudo_to_root.png
+   :alt: Using sudo to switch to the root user.
+   :width: 300
+
+Now type the password you use to login to the machine. If you do not know the
+password that you use to log into the machine then we cannot proceed and you
+should consult someone else as to what your password might be. I suggest trying
+to guess the password.
+
+.. image:: images/terminal_logged_in_as_root.png
+   :alt: Logged in as the root user.
+   :width: 300
+
+After switching to the root user you should see a screen like the
+following. The key to knowing whether or not you are acting as the root user
+under the BASH shell (the shell used by the terminal) is to look at the line
+and note the trailing "#" character at the end of the line.
+
+
+Now you need to use the password command to set root's password. To do this
+type the command::
+
+  passwd
+
+You should then see a screen similar to the following.
+
+.. image:: images/terminal_set_root_password.png
+   :alt: Set the root password.
+   :width: 300
+
+
+You are now required to type your new root password twice. Type the password
+once, then press enter. Now type it again and press enter. If you fail to type
+the password the same both times then you will receive a failure
+message. Otherwise you will be presented with a successful message as shown in
+the following screenshot.
+
+.. image:: images/terminal_set_root_password_completed.png
+   :alt: Successfully set the root password.
+   :width: 300
+
+
+Now that we have set the root password. Please return to the cups webpage and
+try to authenticate using root and the password you chose.
+
+
+35 Watt Laser Cutter Settings
+=============================
+
+Vector Cut Settings
+-------------------
+
+
+============================    ========================================================
+material                        Vector Cutting
+                                Speed/Power/Frequency
+============================    ========================================================
+wood cherry - alder - walnut    1/8" (3mm) - 30/100/500
+                                1/4" (6.4mm) - 7/100/500
+                                (multiple passes may allow cutting of thicker materials)
+acrylic                         1/8" (3mm) - 12/100/5000
+                                1/4" (6.4mm) - 4/100/5000
+                                (multiple passes may allow cutting of thicker materials)
+corian or avonite               1/8" (3mm) - 20/100/5000
+delrin seals                    60/100/500
+laserable plastic               20/60/5000
+leather                         1/8" (3mm) - 35/50/500
+mat board                       30/50/500
+rubber and rubber stamps        15/100/100
+============================    ========================================================
+
+Raster Settings
+---------------
+
+==============================  ===========     ===========     ===========
+material                        300 DPI         400 DPI         600 DPI
+                                Speed/Power     Speed/Power     Speed/Power
+==============================  ===========     ===========     ===========
+wood cherry - alder - walnut    30/100          35/100          40/100
+acrylic                         100/75          100/65          100/55
+anodized aluminum               100/100         100/90          100/80
+brass-painted                   100/65          100/55          100/45
+marbleized painted brass        100/75          100/65          100/55
+corian or avonite               20/100          25/100          30/100
+delrin seals                    100/70          100/60          100/50
+glass                           25/100          30/100          35/100
+laserable plastic               100/80          100/70          100/60
+leather                         100/65          100/55          100/45
+marble                          15/100          20/100          25/100
+mat board                       100/65          100/55          100/45
+melamine                        40/100          50/100          60/100
+stainless steel w/ cerdec coat  15/100          20/100          25/100
+rubber and rubber stamps        10/100          20/100          30/100
+==============================  ===========     ===========     ===========
 
