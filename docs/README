@@ -101,87 +101,101 @@ Chart of Laser Cutter Setting
 
 Here is a chart showing the available laser cutter settings.
 
-+------------------+------------------+------------------+------------------+
-|laser cutter      |description       |key code          |range of setting  |
-|setting           |                  |                  |                  |
-+==================+==================+==================+==================+
-|raster power      |The power of the  |rp                |0 - 100           |
-|                  |laser during      |                  |                  |
-|                  |raster pass. Power|                  |                  |
-|                  |of 0 disables     |                  |                  |
-|                  |raster pass.      |                  |                  |
-+------------------+------------------+------------------+------------------+
-|raster speed      |The speed of the  |rs                |0 - 100           |
-|                  |laser during      |                  |                  |
-|                  |raster pass.      |                  |                  |
-+------------------+------------------+------------------+------------------+
-|vector power      |The power of the  |vp                |0 - 100           |
-|                  |laser during the  |                  |                  |
-|                  |vector cutting    |                  |                  |
-|                  |pass. Power of 0  |                  |                  |
-|                  |disables vector   |                  |                  |
-|                  |pass.             |                  |                  |
-+------------------+------------------+------------------+------------------+
-|vector speed      |The speed of the  |vs                |0 - 100           |
-|                  |laser during the  |                  |                  |
-|                  |vector cutting    |                  |                  |
-|                  |pass.             |                  |                  |
-+------------------+------------------+------------------+------------------+
-|vector frequency  |The frequency by  |vf                |0 - 5000          |
-|                  |which the laser   |                  |                  |
-|                  |turns on and off  |                  |                  |
-|                  |per a second (Hz) |                  |                  |
-|                  |during vector     |                  |                  |
-|                  |cutting pass. Low |                  |                  |
-|                  |values can be used|                  |                  |
-|                  |to create         |                  |                  |
-|                  |perforated lines. |                  |                  |
-|                  |                  |                  |                  |
-|                  |                  |                  |                  |
-+------------------+------------------+------------------+------------------+
-|bed width (in pts)|The width of the  |w                 |1728              |
-|                  |laser cutter bed  |                  |                  |
-|                  |in pts (72 pts per|                  |                  |
-|                  |inch).            |                  |                  |
-+------------------+------------------+------------------+------------------+
-|bed height (in    |The height of the |h                 |864               |
-|pts)              |laser cutter bed  |                  |                  |
-|                  |in pts (72 pts per|                  |                  |
-|                  |inch).            |                  |                  |
-+------------------+------------------+------------------+------------------+
-|screen            |Screen setting    |sc                |-10, 6, 5         |
-|                  |which affects mono|                  |                  |
-|                  |raster mode. This |                  |                  |
-|                  |is half-toning    |                  |                  |
-|                  |settings in       |                  |                  |
-|                  |postscript.       |                  |                  |
-+------------------+------------------+------------------+------------------+
-|resolution (dpi)  |Resolution of the |r                 |75, 300, 600, 1200|
-|                  |raster.           |                  |                  |
-+------------------+------------------+------------------+------------------+
-|auto focus        |Whether to        |af                |0, 1 (for false / |
-|                  |enable/disable    |                  |true respectively)|
-|                  |auto focus.       |                  |                  |
-+------------------+------------------+------------------+------------------+
-|flip              |Whether to flip   |f                 |0, 1 (for false / |
-|                  |the raster image  |                  |true respectively)|
-|                  |along the x axis. |                  |                  |
-+------------------+------------------+------------------+------------------+
-|raster mode       |The raster mode   |rm                |mono, grey, color |
-|                  |which is one of   |                  |                  |
-|                  |mono, grey, or    |                  |                  |
-|                  |color. Mono is    |                  |                  |
-|                  |either on or off  |                  |                  |
-|                  |of laser. Grey is |                  |                  |
-|                  |power of laser    |                  |                  |
-|                  |fluctuates along  |                  |                  |
-|                  |greyscale of      |                  |                  |
-|                  |image. Color is   |                  |                  |
-|                  |laser power       |                  |                  |
-|                  |dependent upon    |                  |                  |
-|                  |what color in     |                  |                  |
-|                  |image.            |                  |                  |
-+------------------+------------------+------------------+------------------+
++------------------+---------------------+------------------+------------------+
+|laser cutter      |description          |key code          |range of setting  |
+|setting           |                     |                  |                  |
++==================+=====================+==================+==================+
+|raster power      |The power of the     |rp or raster-power|0 - 100           |
+|                  |laser during         |                  |                  |
+|                  |raster pass. Power   |                  |                  |
+|                  |of 0 disables        |                  |                  |
+|                  |raster pass.         |                  |                  |
++------------------+---------------------+------------------+------------------+
+|raster speed      |The speed of the     |rs or raster-speed|0 - 100           |
+|                  |laser during         |                  |                  |
+|                  |raster pass.         |                  |                  |
++------------------+---------------------+------------------+------------------+
+|vector power      |The power of the     |vp or vector-power|0 - 100           |
+|                  |laser during the     |                  |                  |
+|                  |vector cutting       |                  |                  |
+|                  |pass. Power of 0     |                  |                  |
+|                  |disables vector      |                  |                  |
+|                  |pass.                |                  |                  |
++------------------+---------------------+------------------+------------------+
+|vector speed      |The speed of the     |vs or vector-speed|0 - 100           |
+|                  |laser during the     |                  |                  |
+|                  |vector cutting       |                  |                  |
+|                  |pass.                |                  |                  |
++------------------+---------------------+------------------+------------------+
+|vector frequency  |The frequency by     |vf or             |0 - 5000          |
+|                  |which the laser      |vector-frequency  |                  |
+|                  |turns on and off     |                  |                  |
+|                  |per a second (Hz)    |                  |                  |
+|                  |during vector        |                  |                  |
+|                  |cutting pass. Low    |                  |                  |
+|                  |values can be used   |                  |                  |
+|                  |to create            |                  |                  |
+|                  |perforated lines.    |                  |                  |
+|                  |                     |                  |                  |
+|                  |                     |                  |                  |
++------------------+---------------------+------------------+------------------+
+|bed width (in pts)|The width of the     |w or width        |1728              |
+|                  |laser cutter bed     |                  |                  |
+|                  |in pts (72 pts per   |                  |                  |
+|                  |inch).               |                  |                  |
++------------------+---------------------+------------------+------------------+
+|bed height (in    |The height of the    |h or height       |864               |
+|pts)              |laser cutter bed     |                  |                  |
+|                  |in pts (72 pts per   |                  |                  |
+|                  |inch).               |                  |                  |
++------------------+---------------------+------------------+------------------+
+|screen            |Screen setting which |sc or screen      |-10, 6, 5         |
+|                  |affects mono raster  |                  |                  |
+|                  |mode. This affects   |                  |                  |
+|                  |half-toning via      |                  |                  |
+|                  |postscript.          |                  |                  |
+|                  |                     |                  |                  |
+|                  |                     |                  |                  |
+|                  |                     |                  |                  |
+|                  |                     |                  |                  |
++------------------+---------------------+------------------+------------------+
+|rotation (degrees)|Number of degrees to |rot or rotate     |-90 (counter      |
+|                  |rotate output job.   |                  |clockwise), 90    |
+|                  |                     |                  |(clockwise), 180  |
++------------------+---------------------+------------------+------------------+
+|resolution (dpi)  |Resolution of the    |r or resolution   |75, 300, 600, 1200|
+|                  |raster.              |                  |                  |
++------------------+---------------------+------------------+------------------+
+|auto focus        |Whether to           |af or auto-focus  |0, 1 (for false / |
+|                  |enable/disable       |                  |true respectively)|
+|                  |auto focus.          |                  |                  |
++------------------+---------------------+------------------+------------------+
+|debug             |Whether or not to    |debug             |existence of key  |
+|                  |output debug files   |                  |enables debug     |
+|                  |for each stage in    |                  |                  |
+|                  |process which are    |                  |                  |
+|                  |stored in the /tmp/  |                  |                  |
+|                  |directory.           |                  |                  |
++------------------+---------------------+------------------+------------------+
+|flip              |Whether to flip      |f or flip         |existence of key  |
+|                  |the raster image     |                  |enables flip      |
+|                  |along the x axis.    |                  |                  |
++------------------+---------------------+------------------+------------------+
+|raster mode       |The raster mode      |rm or raster-mode |mono, grey, color |
+|                  |which is one of      |                  |                  |
+|                  |mono, grey, or       |                  |                  |
+|                  |color. Mono is       |                  |                  |
+|                  |either on or off     |                  |                  |
+|                  |of laser. Grey is    |                  |                  |
+|                  |power of laser       |                  |                  |
+|                  |fluctuates along     |                  |                  |
+|                  |greyscale of         |                  |                  |
+|                  |image. Color is      |                  |                  |
+|                  |laser power          |                  |                  |
+|                  |dependent upon       |                  |                  |
+|                  |what color in        |                  |                  |
+|                  |image.               |                  |                  |
++------------------+---------------------+------------------+------------------+
 
 
 So setting up a queue for matteboard might involve a string such as::
@@ -438,4 +452,50 @@ melamine                        40/100          50/100          60/100
 stainless steel w/ cerdec coat  15/100          20/100          25/100
 rubber and rubber stamps        10/100          20/100          30/100
 ==============================  ===========     ===========     ===========
+
+
+Software BUGS
+=============
+
+Please report software bugs to Brandon Edens at brandon@as220.org.
+
+The most recent version of this software can be found at:
+http://mtm.cba.mit.edu/cups/
+
+
+Known Bugs
+----------
+
+Inkscape Bug
+~~~~~~~~~~~~
+
+One well known and nasty bug occurs with Inkscape > 0.47. It seems that
+Inkscape automatically puts documents into landscape mode when the document
+width is greater than the document's height.
+
+During printing Inkscape sends the document to Cairo which generates the PDF
+that is then ultimately passed on to the printer. The problem here is that
+Cairo does not properly pass the Landscape mode information off to the print
+server so what happens is that documents arrive in the cups backends rotated 90
+degrees counter-clockwise.
+
+There exists no method of automatically correcting for this behavior at this
+time. When using the vinyl cutter please make sure that the document's height
+is greater than the document's width to force the document to be sent in
+portrait mode.
+
+When using the laser cutter, either specify that the output should be rotated
+90 degrees (clockwise).
+
+
+Laser Cutter Bug
+~~~~~~~~~~~~~~~~
+
+The laser cutter software currently lacks an equivalent level of debugging
+information that is present in the vinyl-cutter software. Part of this is due
+to the current transition of the laser-cutter software from the version written
+in C to the Python version. In addition the C version of the software emits
+Bitmaps for the raster images which can be rather large (24 in by 12 in) with
+no compression.
+
 
