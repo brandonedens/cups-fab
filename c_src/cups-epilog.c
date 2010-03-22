@@ -43,6 +43,7 @@
  * allows you to make a printer for each different type of material.
  * af	Auto focus (0=no, 1=yes)
  * r	Resolution 75-1200
+ * rot  Rotation 90, -90, 180
  * rs	Raster speed 1-100
  * rp	Raster power 0-100
  * vs	Vector speed 1-100
@@ -76,6 +77,7 @@
  * Options are as follows, use / to separate :-
  * rp   Raster power
  * rs   Raster speed
+ * rot  Rotation 90, -90, 180
  * vp   Vector power
  * vs   Vector speed
  * vf   Vector frequency
@@ -162,8 +164,8 @@
 /** Additional offset for the Y axis. */
 #define HPGLY (0)
 
-/** Whether or not to rotate the incoming PDF 90 degrees clockwise. */
-#define PDF_ROTATE_90 (0)
+/** Whether or not to rotate the incoming PDF. */
+#define ROTATE_DEFAULT (0)
 
 /** Accepted number of points per an inch. */
 #define POINTS_PER_INCH (72)
@@ -269,6 +271,9 @@ static int raster_power = RASTER_POWER_DEFAULT;
 
 /** Variable to track whether or not a rasterization should be repeated. */
 static int raster_repeat = RASTER_REPEAT;
+
+/** Rotate the job the specified number of degrees. */
+static int rotate = ROTATE_DEFAULT;
 
 /** FIXME -- pixel size of screen, 0= threshold */
 static int screen = SCREEN_DEFAULT;
@@ -1140,41 +1145,44 @@ process_queue_options(char *queue_options)
             while (*o && !isalpha(*o)) {
                 *o++ = 0;
             }
-            if (!strcasecmp(t, "af")) {
+            if (!strcasecmp(t, "af") || !strcasecmp(t, "auto-focus")) {
                 focus = atoi(v);
             }
-            if (!strcasecmp(t, "r")) {
+            if (!strcasecmp(t, "r") || !strcasecmp(t, "resolution")) {
                 resolution = atoi(v);
             }
-            if (!strcasecmp(t, "rs")) {
+            if (!strcasecmp(t, "rs") || !strcasecmp(t, "raster-speed")) {
                 raster_speed = atoi(v);
             }
-            if (!strcasecmp(t, "rp")) {
+            if (!strcasecmp(t, "rp") || !strcasecmp(t, "raster-power")) {
                 raster_power = atoi(v);
             }
-            if (!strcasecmp(t, "rm")) {
+            if (!strcasecmp(t, "rm") || !strcasecmp(t, "raster-mode")) {
                 raster_mode = tolower(*v);
             }
-            if (!strcasecmp(t, "rr")) {
+            if (!strcasecmp(t, "rr") || !strcasecmp(t, "raster-repeat")) {
                 raster_repeat = atoi(v);
             }
-            if (!strcasecmp(t, "vs")) {
+            if (!strcasecmp(t, "vs") || !strcasecmp(t, "vector-speed")) {
                 vector_speed = atoi(v);
             }
-            if (!strcasecmp(t, "vp")) {
+            if (!strcasecmp(t, "vp") || !strcasecmp(t, "vector-power")) {
                 vector_power = atoi(v);
             }
-            if (!strcasecmp(t, "vf")) {
+            if (!strcasecmp(t, "vf") || !strcasecmp(t, "vector-frequency")) {
                 vector_freq = atoi(v);
             }
-            if (!strcasecmp(t, "sc")) {
+            if (!strcasecmp(t, "sc") || !strcasecmp(t, "screen")) {
                 screen = atoi(v);
             }
-            if (!strcasecmp(t, "w")) {
+            if (!strcasecmp(t, "w") || !strcasecmp(t, "width")) {
                 width = atoi(v);
             }
-            if (!strcasecmp(t, "h")) {
+            if (!strcasecmp(t, "h") || !strcasecmp(t, "height")) {
                 height = atoi(v);
+            }
+            if (!strcasecmp(t, "rot") || !strcasecmp(t, "rotate")) {
+                rotate = atoi(v);
             }
             if (!strcasecmp(t, "flip")) {
                 flip = 1;
@@ -1577,12 +1585,18 @@ main(int argc, char *argv[])
         fclose(file_cups);
         fclose(file_pdf);
 
-        if (PDF_ROTATE_90) {
-            /* Configuration specifies that PDF will be rotated 90 degrees
-             * clockwise. Use the program pdftk to rotate the pdf.
-             */
-            sprintf(buf, "/usr/bin/pdftk %s cat endE output %s_rotated.pdf",
-                    filename_pdf, file_basename);
+        if (rotate != 0) {
+            if (rotate == -90) {
+                sprintf(buf, "/usr/bin/pdftk %s cat endL output %s_rotated.pdf",
+                        filename_pdf, file_basename);
+            } else if (rotate == 90) {
+                sprintf(buf, "/usr/bin/pdftk %s cat endR output %s_rotated.pdf",
+                        filename_pdf, file_basename);
+            } else if (rotate == 180 || rotate == -180) {
+                sprintf(buf, "/usr/bin/pdftk %s cat endD output %s_rotated.pdf",
+                        filename_pdf, file_basename);
+            }
+
             /* If debug is enabled then print the command to be executed. */
             if (debug) {
                 fprintf(stderr, "%s\n", buf);
