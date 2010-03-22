@@ -57,8 +57,12 @@ class Device(object):
         Parse the device_uri options.
         """
         log.info('Parsing device options.')
-        match = re.search('([A-Za-z\-0-9]+)://([A-Za-z\-0-9.]+)/(.*)',
+        match = re.search('([A-Za-z\-0-9]+)://([A-Za-z\-0-9\.:]+)/(.*?)',
                           device_uri)
+        if not match:
+            log.crit("Could not parse the device settings specified by cups.")
+            sys.exit(1)
+
         # First parameter is the backend name.
         self.backend = match.group(1)
         # Second parameter is the name of either the serial or network device
@@ -87,27 +91,30 @@ class Device(object):
 
         match = re.search('([A-Za-z\-0-9]+)://([A-Za-z\-0-9.]+)/(.*)',
                           device_uri)
-        settings = match.group(3).split('/')
         self.options = {}
-        for option in settings:
-            if option:
-                (key, value) = option.split('=')
-                value = value.lower()
-                # Handle values that are booleans.
-                if value in ['1', 't', 'true']:
-                    self.options[key] = True
-                    continue
-                elif value in ['0', 'f', 'false']:
-                    self.options[key] = False
-                    continue
-                # Handle values that are integers.
-                try:
-                    self.options[key] = int(value)
-                    continue
-                except ValueError:
-                    pass
-                # Handle values all other values.
-                self.options[key] = value
+        try:
+            settings = match.group(3).split('/')
+            for option in settings:
+                if option:
+                    (key, value) = option.split('=')
+                    value = value.lower()
+                    # Handle values that are booleans.
+                    if value in ['1', 't', 'true']:
+                        self.options[key] = True
+                        continue
+                    elif value in ['0', 'f', 'false']:
+                        self.options[key] = False
+                        continue
+                    # Handle values that are integers.
+                    try:
+                        self.options[key] = int(value)
+                        continue
+                    except ValueError:
+                        pass
+                    # Handle values all other values.
+                    self.options[key] = value
+        except AttributeError:
+            pass
 
     def __str__(self):
         return "%s %s \"%s\" \"%s\"" % (self.device_class,
