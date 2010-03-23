@@ -391,7 +391,7 @@ execute_ghostscript(char *filename_bitmap,
             filename_eps,
             filename_vector);
     if (debug) {
-        fprintf(stderr, "%s\n", buf);
+        fprintf(stderr, "DEBUG: ghostscript command executed as: %s\n", buf);
     }
     if (system(buf)) {
         return false;
@@ -471,7 +471,7 @@ generate_raster(FILE *pjl_file, FILE *bitmap_file)
             d = (h + 3) / 4 * 4;
         }
         if (debug) {
-            fprintf(stderr, "Width %d Height %d Bytes %d Line %d\n",
+            fprintf(stderr, "DEBUG: raster Width %d Height %d Bytes %d Line %d\n",
                     width, height, h, d);
         }
 
@@ -548,14 +548,14 @@ generate_raster(FILE *pjl_file, FILE *bitmap_file)
                             char *f = buf;
                             char *t = buf;
                             if (d > sizeof (buf)) {
-                                perror("Too wide");
+                                fprintf(stderr, "CRIT: Data in buffer was buffer was larger than expected."
                                 return false;
                             }
                             l = fread ((char *)buf, 1, d, bitmap_file);
-                            if (l != d) {
-                                fprintf(stderr, "Bad bit data from gs %d/%d (y=%d)\n", l, d, y);
-                                return false;
-                            }
+                                if (l != d) {
+                                    fprintf(stderr, "CRIT: Bad bit data from gs %d/%d (y=%d)\n", l, d, y);
+                                    return false;
+                                }
                             while (l--) {
                                 // pack and pass check RGB
                                 int n = 0;
@@ -589,12 +589,12 @@ generate_raster(FILE *pjl_file, FILE *bitmap_file)
                             /* BMP padded to 4 bytes per scan line */
                             int d = (h + 3) / 4 * 4;
                             if (d > sizeof (buf)) {
-                                fprintf(stderr, "Too wide\n");
+                                fprintf(stderr, "CRIT: Data in buffer was too wide.\n");
                                 return false;
                             }
                             l = fread((char *)buf, 1, d, bitmap_file);
                             if (l != d) {
-                                fprintf (stderr, "Bad bit data from gs %d/%d (y=%d)\n", l, d, y);
+                                fprintf (stderr, "CRIT: Bad bit data from gs %d/%d (y=%d)\n", l, d, y);
                                 return false;
                             }
                             for (l = 0; l < h; l++) {
@@ -607,13 +607,13 @@ generate_raster(FILE *pjl_file, FILE *bitmap_file)
                             int d = (h + 3) / 4 * 4;  // BMP padded to 4 bytes per scan line
                             if (d > sizeof (buf))
                             {
-                                perror("Too wide");
+                                fprintf(stderr, "CRIT: Data in raster buffer was too wide.")
                                 return false;
                             }
                             l = fread((char *) buf, 1, d, bitmap_file);
                             if (l != d)
                             {
-                                fprintf(stderr, "Bad bit data from gs %d/%d (y=%d)\n", l, d, y);
+                                fprintf(stderr, "CRIT: Bad bit data from gs %d/%d (y=%d)\n", l, d, y);
                                 return false;
                             }
                         }
@@ -1125,7 +1125,7 @@ process_queue_options(char *queue_options)
     char *o = strchr(queue_options, '/');
 
     if (!queue_options) {
-        fprintf(stderr, "URI syntax epilog://host/queue_optionsname\n");
+        fprintf(stderr, "CRIT: Failure to parse URI options.\n");
         return false;
     }
     *queue_options++ = 0;
@@ -1305,8 +1305,8 @@ printer_connect(const char *host, const int timeout)
         sleep(1);
     }
     if (i >= timeout) {
-        fprintf(stderr, "Cannot connect to %s\n", host);
-        return -1;
+        fprintf(stderr, "CRIT: Cannot connect to %s\n", host);
+        return 1;
     }
     /* Disable the timeout alarm. */
     alarm(0);
@@ -1375,7 +1375,7 @@ printer_send(const char *host, FILE *pjl_file)
     write(socket_descriptor, (char *)buf, strlen(buf));
     read(socket_descriptor, &lpdres, 1);
     if (lpdres) {
-        fprintf (stderr, "Bad response from %s, %u\n", host, lpdres);
+        fprintf (stderr, "CRIT: Bad response from %s, %u\n", host, lpdres);
         return false;
     }
     sprintf(buf, "H%s\n", localhost);
@@ -1388,13 +1388,13 @@ printer_send(const char *host, FILE *pjl_file)
     write(socket_descriptor, buf + strlen(buf) + 1, strlen(buf + strlen(buf) + 1));
     read(socket_descriptor, &lpdres, 1);
     if (lpdres) {
-        fprintf(stderr, "Bad response from %s, %u\n", host, lpdres);
+        fprintf(stderr, "CRIT: Bad response from %s, %u\n", host, lpdres);
         return false;
     }
     write(socket_descriptor, (char *)buf, strlen(buf) + 1);
     read(socket_descriptor, &lpdres, 1);
     if (lpdres) {
-        fprintf(stderr, "Bad response from %s, %u\n", host, lpdres);
+        fprintf(stderr, "CRIT: Bad response from %s, %u\n", host, lpdres);
         return false;
     }
     {
@@ -1409,7 +1409,7 @@ printer_send(const char *host, FILE *pjl_file)
         write(socket_descriptor, (char *)buf, strlen(buf));
         read(socket_descriptor, &lpdres, 1);
         if (lpdres) {
-            fprintf(stderr, "Bad response from %s, %u\n", host, lpdres);
+            fprintf(stderr, "CRIT: Bad response from %s, %u\n", host, lpdres);
             return false;
         }
         {
@@ -1496,21 +1496,21 @@ main(int argc, char *argv[])
     /* Gather the site information from the user's environment variable. */
     device_uri = getenv("DEVICE_URI");
     if (!device_uri) {
-        fprintf(stderr, "No $DEVICE_URI set\n");
-        return 0;
+        fprintf(stderr, "CRIT: No $DEVICE_URI set\n");
+        return 1;
     }
     host = strstr(device_uri, "//");
     if (!host) {
-        fprintf(stderr, "URI syntax epilog://host/queuename\n");
-        return 0;
+        fprintf(stderr, "CRIT: Bad URI for printer specified. Lacked the // in 'laser-cutter://'\n");
+        return 1;
     }
     host += 2;
 
     /* Process the queue arguments. */
     queue = strchr(host, '/');
     if (!process_queue_options(queue)) {
-        fprintf(stderr, "Error processing epilog queue options.");
-        return 0;
+        fprintf(stderr, "CRIT: Error processing epilog queue options.");
+        return 1;
     }
 
     /* Perform a check over the global values to ensure that they have values
@@ -1602,11 +1602,11 @@ main(int argc, char *argv[])
 
             /* If debug is enabled then print the command to be executed. */
             if (debug) {
-                fprintf(stderr, "%s\n", buf);
+                fprintf(stderr, "DEBUG: Executing pdftk command: %s\n", buf);
             }
             /* Execute the pdftk command. */
             if (system(buf)) {
-                fprintf(stderr, "Failure to execute pdftk. Quitting...");
+                fprintf(stderr, "CRIT: Failure during execution of pdftk.\n");
                 return 1;
             }
             /* Cleanup old pdf file if debug not enabled. */
@@ -1629,7 +1629,7 @@ main(int argc, char *argv[])
             fprintf(stderr, "%s\n", buf);
         }
         if (system(buf)) {
-            fprintf(stderr, "Failure to execute pdf2ps. Quitting...");
+            fprintf(stderr, "CRIT: Failure during execution of pdf2ps.\n");
             return 1;
         }
 
@@ -1655,7 +1655,7 @@ main(int argc, char *argv[])
     }
     /* Convert postscript to encapsulated postscript. */
     if (!ps_to_eps(file_ps, file_eps)) {
-        perror("Error converting postscript to encapsulated postscript.");
+        fprintf(stderr, "CRIT: Failure converting postscript to encapsulated postscript.\n");
         fclose(file_eps);
         return 1;
     }
@@ -1674,7 +1674,7 @@ main(int argc, char *argv[])
                             (raster_mode == 'c') ? "bmp16m" :
                             (raster_mode == 'g') ? "bmpgray" : "bmpmono",
                             resolution, height, width)) {
-        perror("Failure to execute ghostscript command.\n");
+        fprintf(stderr, "CRIT: Failure to execute ghostscript command.\n");
         return 1;
     }
 
@@ -1702,7 +1702,7 @@ main(int argc, char *argv[])
     }
     /* Execute the generation of the printer job language (pjl) file. */
     if (!generate_pjl(file_bitmap, file_pjl, file_vector)) {
-        perror("Generation of pjl file failed.\n");
+        fprintf(stderr, "CRIT: Generation of pjl file failed.\n");
         fclose(file_pjl);
         return 1;
     }
@@ -1732,7 +1732,7 @@ main(int argc, char *argv[])
     }
     /* Send print job to printer. */
     if (!printer_send(host, file_pjl)) {
-        perror("Could not send pjl file to printer.\n");
+        fprintf(stderr, "CRIT: Could not send PJL file to printer.\n");
         return 1;
     }
     fclose(file_pjl);
@@ -1741,7 +1741,6 @@ main(int argc, char *argv[])
             perror(filename_pjl);
         }
     }
-
     return 0;
 }
 
