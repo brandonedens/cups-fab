@@ -1475,7 +1475,7 @@ main(int argc, char *argv[])
      */
     if (argc == 1) {
         printf("direct laser-cutter \"Generic Laser Cutter\" \"Laser Cutter (thin red lines vector cut)\"\n");
-        return 1;
+        return 0;
     }
     if (argc > 1) {
         job_name = argv[1];
