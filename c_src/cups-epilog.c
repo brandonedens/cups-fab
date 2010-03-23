@@ -881,11 +881,14 @@ generate_vector(FILE *pjl_file, FILE *vector_file)
 
 
 /**
- *
+ * Generate postscript job language output (PJL) from the given bitmap file
+ * and vector file finally storing the result in the pjl file. This function
+ * calls both generate_raster and generator_vector generating both the PCL and
+ * HPGL data from the given bitmap and vector information.
  */
 static bool
 generate_pjl(FILE *bitmap_file, FILE *pjl_file,
-                              FILE *vector_file)
+             FILE *vector_file)
 {
     int i;
 
