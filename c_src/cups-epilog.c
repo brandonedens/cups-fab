@@ -548,7 +548,7 @@ generate_raster(FILE *pjl_file, FILE *bitmap_file)
                             char *f = buf;
                             char *t = buf;
                             if (d > sizeof (buf)) {
-                                fprintf(stderr, "CRIT: Data in buffer was buffer was larger than expected."
+                                fprintf(stderr, "CRIT: Data in buffer was buffer was larger than expected.");
                                 return false;
                             }
                             l = fread ((char *)buf, 1, d, bitmap_file);
@@ -607,7 +607,7 @@ generate_raster(FILE *pjl_file, FILE *bitmap_file)
                             int d = (h + 3) / 4 * 4;  // BMP padded to 4 bytes per scan line
                             if (d > sizeof (buf))
                             {
-                                fprintf(stderr, "CRIT: Data in raster buffer was too wide.")
+                                fprintf(stderr, "CRIT: Data in raster buffer was too wide.");
                                 return false;
                             }
                             l = fread((char *) buf, 1, d, bitmap_file);
@@ -644,22 +644,11 @@ generate_raster(FILE *pjl_file, FILE *bitmap_file)
                             }
                             r++;
                             fprintf(pjl_file, "\e*p%dY", basey + offy + y);
-                            if (debug) {
-                                fprintf(stderr, "DEBUG: Raster Y *p%dY\n", basey + offy + y);
-                            }
                             fprintf(pjl_file, "\e*p%dX", basex + offx +
                                     ((raster_mode == 'c' || raster_mode == 'g')
                                      ? l : l * 8));
-                            if (debug) {
-                                fprintf(stderr, "DEBUG: Raster X *p%dX\n", basex + offx +
-                                    ((raster_mode == 'c' || raster_mode == 'g')
-                                     ? l : l * 8));
-                            }
                             if (dir) {
                                 fprintf(pjl_file, "\e*b%dA", -(r - l));
-                                if (debug) {
-                                    fprintf(stderr, "DEBUG: Raster *b%dA\n", -(r - l));
-                                }
                                 // reverse bytes!
                                 for (n = 0; n < (r - l) / 2; n++){
                                     unsigned char t = buf[l + n];
